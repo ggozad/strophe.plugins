@@ -7,7 +7,7 @@ A collection of Strophe plugins partially covering
 
 ## Documentation
 
-Please refer to the [inline documentation]. (http://ggozad.com/strophe.plugins)
+Please refer to the [inline documentation](http://ggozad.com/strophe.plugins).
 
 ## License
 
