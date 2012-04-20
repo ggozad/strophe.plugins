@@ -1,0 +1,2 @@
+strophe.plugins
+===============
