@@ -8,7 +8,7 @@ A collection of Strophe plugins partially covering
 ## License
 
 strophe.plugins is Copyright (C) 2012 Yiorgis Gozadinos, Riot AS.
-It is be freely distributed under the MIT license.
+It is freely distributed under the MIT license.
 
 [Backbone]: http://documentcloud.github.com/backbone
 [XEP-0060]: http://xmpp.org/extensions/xep-0060.html
