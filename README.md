@@ -7,7 +7,10 @@ A collection of Strophe plugins partially covering
 
 ## Documentation
 
-Please refer to the [inline documentation](http://ggozad.com/strophe.plugins).
+Please refer to the annotated source:
+
+* [strophe.pubsub.js](http://ggozad.com/strophe.plugins/docs/strophe.pubsub.js)
+* [strophe.forms.js](http://ggozad.com/strophe.plugins/docs/strophe.forms.js)
 
 ## License
 
