@@ -9,8 +9,8 @@ A collection of Strophe plugins partially covering
 
 Please refer to the annotated source:
 
-* [strophe.pubsub.js](http://ggozad.com/strophe.plugins/docs/strophe.pubsub.js)
-* [strophe.forms.js](http://ggozad.com/strophe.plugins/docs/strophe.forms.js)
+* [strophe.pubsub.js](http://ggozad.com/strophe.plugins/docs/strophe.pubsub.html)
+* [strophe.forms.js](http://ggozad.com/strophe.plugins/docs/strophe.forms.html)
 
 ## License
 
