@@ -465,5 +465,40 @@
             expect(successHandler).toHaveBeenCalledWith([{jid: Strophe.connection.jid, node: 'anode', subid: '123', subscription: 'subscribed'}]);
         });
 
+        it('can transform a js Date() to an ISO 8601 formatted string', function () {
+            var date = new Date("June 5, 1974 11:13:00 GMT+0200");
+            expect(Strophe.connection.PubSub._ISODateString(date)).toEqual('1974-06-05T09:13:00Z');
+        });
+
+        it('can transform a JS object containing strings, numbers, booleans, dates or nested combinations of those, to ATOM format', function () {
+            var obj = {
+                title: 'An atom',
+                geolocation: {latitude: 10.23, longitude: 20.45},
+                active: true,
+                published: new Date("June 5, 1974 11:13:00 GMT+0200")
+            }, atom = Strophe.connection.PubSub._JsonToAtom(obj);
+            var expected = $build('entry', {xmlns: Strophe.NS.ATOM})
+                .c('title').t('An atom').up()
+                .c('geolocation').c('latitude').t('10.23').up().c('longitude').t('20.45').up().up()
+                .c('active').t('true').up()
+                .c('published').t('1974-06-05T09:13:00Z')
+                .tree();
+            expect(atom.isEqualNode(expected)).toBeTruthy();
+        });
+
+        it('can transform an ATOM xml to a JSON object', function () {
+            var entry = $build('entry', {xmlns: Strophe.NS.ATOM})
+                .c('title').t('An atom').up()
+                .c('geolocation').c('latitude').t('10.23').up().c('longitude').t('20.45').up().up()
+                .c('published').t('1974-06-05T09:13:00Z')
+                .tree();
+            expect(Strophe.connection.PubSub._AtomToJson(entry)).toEqual({
+                title: 'An atom',
+                geolocation: {latitude: '10.23', longitude: '20.45'},
+                published: '1974-06-05T09:13:00Z'
+            });
+        });
+
+
     });
 })(this.jQuery, this._, this.Backbone, this.Strophe, this.jasmine, this.xmppMocker);

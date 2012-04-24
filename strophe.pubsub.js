@@ -267,6 +267,66 @@
                     }));
                 }, d.reject);
             return d.promise();
+        },
+
+        // Private utility functions
+
+        // **_ISODateString** converts a date to an ISO-formatted string.
+        _ISODateString: function (d) {
+            function pad(n) {
+                return n < 10 ? '0' + n : n;
+            }
+            return d.getUTCFullYear() + '-' +
+                pad(d.getUTCMonth() + 1) + '-' +
+                pad(d.getUTCDate()) + 'T' +
+                pad(d.getUTCHours()) + ':' +
+                pad(d.getUTCMinutes()) + ':' +
+                pad(d.getUTCSeconds()) + 'Z';
+        },
+
+        // **_JsonToAtom** produces an atom-format XML tree from a JSON object.
+        _JsonToAtom: function (obj, tag) {
+            var builder;
+
+            if (!tag) {
+                builder = $build('entry', {xmlns: Strophe.NS.ATOM});
+            } else {
+                builder = $build(tag);
+            }
+            _.each(obj, function (value, key) {
+                if (typeof value === 'string') {
+                    builder.c(key, {}, value);
+                } else if (typeof value === 'number') {
+                    builder.c(key, {}, value.toString());
+                } else if (typeof value === 'boolean') {
+                    builder.c(key, {}, value.toString());
+                } else if (typeof value === 'object' && 'toUTCString' in value) {
+                    builder.c(key, {}, this._ISODateString(value));
+                } else if (typeof value === 'object') {
+                    builder.cnode(this._JsonToAtom(value, key)).up();
+                } else {
+                    this.c(key).up();
+                }
+            }, this);
+            return builder.tree();
+        },
+
+        // **_AtomToJson** produces a JSON object from an atom-formatted XML tree.
+        _AtomToJson: function (xml) {
+            var json = {},
+                self = this,
+                jqEl;
+
+            $(xml).children().each(function (idx, el) {
+                jqEl = $(el);
+                if (jqEl.children().length === 0) {
+                    json[el.nodeName] = jqEl.text();
+                } else {
+                    json[el.nodeName] = self._AtomToJson(el);
+                }
+            });
+            return json;
         }
+
     });
 })(this.jQuery, this._, this.Backbone, this.Strophe);
