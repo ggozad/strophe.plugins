@@ -17,10 +17,10 @@
         service: null,
         events: {},
 
-        // **init** adds the various namespaces we use, as well as extends from
-        // **Backbone.Events**.
-        init: function (conn) {
-            this._connection = conn;
+        // **init** adds the various namespaces we use and extends the component
+        // from **Backbone.Events**.
+        init: function (connection) {
+            this._connection = connection;
             Strophe.addNamespace('PUBSUB', 'http://jabber.org/protocol/pubsub');
             Strophe.addNamespace('PUBSUB_EVENT', Strophe.NS.PUBSUB + '#event');
             Strophe.addNamespace('PUBSUB_OWNER', Strophe.NS.PUBSUB + '#owner');
@@ -53,7 +53,6 @@
                 }
 
                 if (delay) {
-
                     // PEP event for the last-published item on a node.
                     self.trigger('xmpp:pubsub:last-published-item', {
                         node: node,
@@ -67,7 +66,6 @@
                         timestamp: delay
                     });
                 } else {
-
                     // PEP event for an item newly published on a node.
                     self.trigger('xmpp:pubsub:item-published', {
                         node: node,
@@ -166,12 +164,12 @@
         // Resolves on success to the id of the item on the node.
         // See [http://xmpp.org/extensions/xep-0060.html#publisher-publish](http://xmpp.org/extensions/xep-0060.html#publisher-publish)
         publish: function (node, item, item_id) {
-            var d = $.Deferred();
-            var iq = $iq({to: this.service, type: 'set', id: this._connection.getUniqueId('pubsub')})
-                .c('pubsub', {xmlns: Strophe.NS.PUBSUB})
-                .c('publish', {node: node})
-                .c('item', item_id ? {id: item_id} : {})
-                .cnode(item);
+            var d = $.Deferred(),
+                iq = $iq({to: this.service, type: 'set', id: this._connection.getUniqueId('pubsub')})
+                    .c('pubsub', {xmlns: Strophe.NS.PUBSUB})
+                    .c('publish', {node: node})
+                    .c('item', item_id ? {id: item_id} : {})
+                    .cnode(item);
             this._connection.sendIQ(iq.tree(),
                 function (result) {
                     d.resolve($('item', result).attr('id'));
