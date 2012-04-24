@@ -179,6 +179,12 @@
             return d.promise();
         },
 
+        // **publishAtom** publishes a JSON object as an ATOM entry.
+        publishAtom: function (node, json, item_id) {
+            json.updated = json.updated || (this._ISODateString(new Date()));
+            return this.publish(node, this._JsonToAtom(json), item_id);
+        },
+
         // **deleteItem** deletes the item with id `item_id` from the node with id `node`.
         // `notify` specifies whether the service should notify all subscribers with a PEP event.
         // See [http://xmpp.org/extensions/xep-0060.html#publisher-delete](http://xmpp.org/extensions/xep-0060.html#publisher-delete)

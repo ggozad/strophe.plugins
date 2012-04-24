@@ -289,6 +289,33 @@
             expect(successHandler).toHaveBeenCalledWith('some_id');
         });
 
+        it('publishes an atom item on a PubSub node', function () {
+            var obj = {
+                title: 'An atom',
+                geolocation: {latitude: 10.23, longitude: 20.45},
+                published: new Date("June 5, 1974 11:13:00 GMT+0200")
+            };
+
+            spyOn(connection, 'send').andCallFake(function (request) {
+                request = xmppMocker.jquerify(request);
+                expect($('iq > pubsub > publish > item', request).attr('id')).toEqual('some_id');
+                expect($('iq > pubsub > publish > item > entry[xmlns="' + Strophe.NS.ATOM + '"]', request).length > 0).toBeTruthy();
+                expect($('iq > pubsub > publish > item > entry > updated', request).length > 0).toBeTruthy();
+                response = $iq({type: 'result', id: $('iq', request).attr('id')})
+                    .c('pubsub', {xmlns: Strophe.NS.PUBSUB})
+                    .c('publish', {node: 'anode'})
+                    .c('item', {id: 'some_id'})
+                    .tree();
+                xmppMocker.receive(connection, response);
+            });
+
+            promise = connection.PubSub.publishAtom('anode', obj, 'some_id');
+            promise.done(successHandler);
+            promise.fail(errorHandler);
+            expect(errorHandler).wasNotCalled();
+            expect(successHandler).toHaveBeenCalledWith('some_id');
+        });
+
         it('deletes an item from a PubSub node', function () {
             spyOn(connection, 'send').andCallFake(function (request) {
                 request = xmppMocker.jquerify(request);
