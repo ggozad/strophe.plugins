@@ -2,10 +2,10 @@
 
     describe('Forms Plugin', function () {
 
-        var successHandler, errorHandler, request, response, promise;
+        var successHandler, errorHandler, connection, request, response, promise;
 
         beforeEach(function () {
-            Strophe.connection = xmppMocker.mockConnection();
+            connection = xmppMocker.mockConnection();
             successHandler = jasmine.createSpy('successHandler');
             errorHandler = jasmine.createSpy('errorHandler');
             request = '';
