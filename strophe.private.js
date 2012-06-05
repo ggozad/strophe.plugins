@@ -1,3 +1,14 @@
+//    XMPP plugins for Strophe v0.1
+
+//    (c) 2012 Yiorgis Gozadinos, Riot AS.
+//    strophe.plugins is distributed under the MIT license.
+//    http://github.com/ggozad/strophe.plugins
+
+
+// Helpers for dealing with
+// [XEP-0049: vcard-temp](http://xmpp.org/extensions/xep-0049.html)
+
+
 (function ($, _, Backbone, Strophe) {
 
     Strophe.addConnectionPlugin('Private', {
