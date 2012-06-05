@@ -10,7 +10,7 @@ A collection of Strophe plugins covering the essential parts of
 
 ## Documentation
 
-Please refer to the annotated source in the `docs` folder:
+Please refer to the annotated source:
 
 * [strophe.pubsub.js](http://ggozad.com/strophe.plugins/docs/strophe.pubsub.html)
 * [strophe.forms.js](http://ggozad.com/strophe.plugins/docs/strophe.forms.html)
