@@ -1,0 +1,42 @@
+(function ($, _, Backbone, Strophe) {
+
+    Strophe.addConnectionPlugin('Private', {
+
+        _connection: null,
+
+        init: function (conn) {
+            this._connection = conn;
+            Strophe.addNamespace('PRIVATE', "jabber:iq:private");
+        },
+
+        // **get** returns the value of `key` on the namespace `ns`,
+        // or `undefined` if there is no stored value.
+        get: function (key, ns) {
+
+            var d = $.Deferred(),
+                iq = $iq({ type: 'get', id: this._connection.getUniqueId('private')})
+                    .c('query', { xmlns: Strophe.NS.PRIVATE })
+                    .c(key, { xmlns: ns + ':' + key}).tree();
+            this._connection.sendIQ(iq, function (response) {
+                    var value = $(key + '[xmlns="' + ns + ':' + key + '"] > value', response).text();
+                    value = value ? JSON.parse(value) : undefined;
+                    d.resolve(value);
+                }, d.reject);
+            return d.promise();
+        },
+
+        // **set** sets the `key` on the namespace `ns` to `value`. `value` can be any JSON-ifiable object.
+        set: function (key, ns, value) {
+            var d = $.Deferred(), iq;
+            value = JSON.stringify(value);
+            iq = $iq({type: 'set', id: this._connection.getUniqueId('private')})
+                .c('query', {xmlns: 'jabber:iq:private'})
+                .c(key, {xmlns: ns + ':' + key})
+                .c('value', value)
+                .tree();
+            this._connection.sendIQ(iq, d.resolve, d.reject);
+            return d.promise();
+        }
+    });
+
+})(this.jQuery, this._, this.Backbone, this.Strophe);
