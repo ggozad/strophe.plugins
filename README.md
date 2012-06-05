@@ -6,6 +6,7 @@ A collection of Strophe plugins covering the essential parts of
 * [XEP-0004: Data Forms](http://xmpp.org/extensions/xep-0004.html)
 * [XEP-0054: vcard-temp](http://xmpp.org/extensions/xep-0054.html)
 * [XEP-0049: Private XML storage](http://xmpp.org/extensions/xep-0049.html)
+* [Roster management](http://xmpp.org/rfcs/rfc6121.html) & [Roster Item Exchange](http://xmpp.org/extensions/xep-0144.html)
 
 ## Documentation
 
@@ -15,6 +16,7 @@ Please refer to the annotated source in the `docs` folder:
 * [strophe.forms.js](http://ggozad.com/strophe.plugins/docs/strophe.forms.html)
 * [strophe.vcard.js](http://ggozad.com/strophe.plugins/docs/strophe.vcard.html)
 * [strophe.private.js](http://ggozad.com/strophe.plugins/docs/strophe.private.html)
+* [strophe.roster.js](http://ggozad.com/strophe.plugins/docs/strophe.roster.html)
 
 ## Dependencies
 
