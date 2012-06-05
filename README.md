@@ -5,7 +5,7 @@ A collection of Strophe plugins covering the essential parts of
 * [XEP-0060 Publish-Subscribe](http://xmpp.org/extensions/xep-0060.html)
 * [XEP-0004: Data Forms](http://xmpp.org/extensions/xep-0004.html)
 * [XEP-0054: vcard-temp](http://xmpp.org/extensions/xep-0054.html)
-* [XEP-0049: vcard-temp](http://xmpp.org/extensions/xep-0049.html)
+* [XEP-0049: Private XML storage](http://xmpp.org/extensions/xep-0049.html)
 
 ## Documentation
 
