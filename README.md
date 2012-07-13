@@ -24,7 +24,7 @@ Please refer to the annotated source:
 
 ## License
 
-strophe.plugins is Copyright (C) 2012 Yiorgis Gozadinos, Riot AS.
+strophe.plugins is Copyright (C) 2012 Yiorgis Gozadinos.
 It is distributed under the MIT license.
 
 [Strophe]: http://strophe.im/strophejs
