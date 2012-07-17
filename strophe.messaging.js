@@ -1,5 +1,13 @@
-(function ($, _, Backbone, Strophe) {
+//    XMPP plugins for Strophe v0.1
 
+//    (c) 2012 Yiorgis Gozadinos.
+//    strophe.plugins is distributed under the MIT license.
+//    http://github.com/ggozad/strophe.plugins
+
+
+// Plugin to deal with basic instant messaging
+
+(function ($, _, Backbone, Strophe) {
 
     Strophe.addConnectionPlugin('messaging', {
 
