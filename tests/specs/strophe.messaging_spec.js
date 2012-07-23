@@ -12,7 +12,7 @@
             });
 
             it('is available to the xmpp connection upon attaching', function () {
-                expect(connection.messaging).toBeTruthy();
+                expect(connection.Messaging).toBeTruthy();
             });
 
             it('can send a plaintext message using send()', function () {
@@ -22,7 +22,7 @@
                     expect($('message', request).attr('to')).toEqual('foo@riot.com/home');
                     expect($('message > body', request).text()).toEqual('Hello world');
                 });
-                connection.messaging.send('foo@riot.com/home',
+                connection.Messaging.send('foo@riot.com/home',
                                                'Hello world');
             });
 
@@ -34,7 +34,7 @@
                     expect($('message > body', request).text()).toEqual('Hello world');
                     expect($('message > html > body > p > a', request).text()).toEqual('Hello');
                 });
-                connection.messaging.send('foo@riot.com/home',
+                connection.Messaging.send('foo@riot.com/home',
                                                'Hello world',
                                                '<p><a href="http://world.com">Hello</a></p>');
             });
@@ -43,7 +43,7 @@
                 var messageHandler = jasmine.createSpy('messageHandler');
                 var msg = $msg({from: 'foo@riot.com', type: 'chat'})
                     .c('body', {}, 'Hello world');
-                connection.messaging.bind('xmpp:message', messageHandler);
+                connection.Messaging.bind('xmpp:message', messageHandler);
                 xmppMocker.receive(connection, msg);
                 expect(messageHandler).toHaveBeenCalledWith({jid: 'foo@riot.com',
                                                              type: 'chat',
@@ -59,7 +59,7 @@
                     .h('<p><a href="http://world.com">Hello</a></p>')
                     .up().up()
                     .c('body', {}, 'Hello world');
-                connection.messaging.bind('xmpp:message', messageHandler);
+                connection.Messaging.bind('xmpp:message', messageHandler);
                 xmppMocker.receive(connection, msg);
                 expect(messageHandler).toHaveBeenCalledWith({jid: 'foo@riot.com',
                                                              type: 'chat',

@@ -22,7 +22,7 @@
     }
 }(this,function ($, _, Backbone, Strophe) {
 
-    Strophe.addConnectionPlugin('messaging', {
+    Strophe.addConnectionPlugin('Messaging', {
 
         _connection: null,
 
