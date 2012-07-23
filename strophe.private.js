@@ -8,8 +8,20 @@
 // Helpers for dealing with
 // [XEP-0049: vcard-temp](http://xmpp.org/extensions/xep-0049.html)
 
-
-(function ($, _, Backbone, Strophe) {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['jquery', 'underscore', 'backbone', 'strophe'], function ($, _, Backbone, Strophe) {
+            // Also create a global in case some scripts
+            // that are loaded still are looking for
+            // a global even when an AMD loader is in use.
+            return factory($, _, Backbone, Strophe);
+        });
+    } else {
+        // Browser globals
+        factory(root.$, root._, root.Backbone, root.Strophe);
+    }
+}(this,function ($, _, Backbone, Strophe) {
 
     Strophe.addConnectionPlugin('Private', {
 
@@ -50,4 +62,4 @@
         }
     });
 
-})(this.jQuery, this._, this.Backbone, this.Strophe);
+}));
