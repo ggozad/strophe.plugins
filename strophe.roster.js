@@ -1,4 +1,4 @@
-//    XMPP plugins for Strophe v0.1
+//    XMPP plugins for Strophe v0.2
 
 //    (c) 2012 Yiorgis Gozadinos.
 //    strophe.plugins is distributed under the MIT license.
