@@ -8,7 +8,20 @@
 // Helpers for dealing with
 // [XEP-0004: Data Forms](http://xmpp.org/extensions/xep-0004.html)
 
-(function ($, _, Strophe) {
+(function (root, factory) {
+    if (typeof define === 'function' && define.amd) {
+        // AMD. Register as an anonymous module.
+        define(['jquery', 'underscore', 'strophe'], function ($, _, Strophe) {
+            // Also create a global in case some scripts
+            // that are loaded still are looking for
+            // a global even when an AMD loader is in use.
+            return (Strophe.x = factory($, _, Strophe));
+        });
+    } else {
+        // Browser globals
+        Strophe.x = factory(root.$, root._, root.Strophe);
+    }
+}(this,function ($, _, Strophe) {
 
     // **Option** contructor
     var Option = function (opts) {
@@ -173,11 +186,9 @@
     };
 
     // Attach to **Strophe** as `x`. No need for a plugin.
-    Strophe.x = {
+    return {
         Form: Form,
         Field: Field,
         Option: Option
     };
-
-
-})(this.jQuery, this._, this.Strophe);
+}));
