@@ -319,14 +319,19 @@
         _AtomToJson: function (xml) {
             var json = {},
                 self = this,
-                jqEl;
+                jqEl,
+                val;
 
             $(xml).children().each(function (idx, el) {
                 jqEl = $(el);
                 if (jqEl.children().length === 0) {
-                    json[el.nodeName] = jqEl.text();
+                    val = jqEl.text();
+                    if ($.isNumeric(val)) {
+                        val = Number(val);
+                    }
+                    json[el.nodeName.toLowerCase()] = val;
                 } else {
-                    json[el.nodeName] = self._AtomToJson(el);
+                    json[el.nodeName.toLowerCase()] = self._AtomToJson(el);
                 }
             });
             return json;
