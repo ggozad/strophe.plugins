@@ -214,11 +214,12 @@
         // Optionally, you can specify `max_items` to retrieve a maximum number of items,
         // or a list of item ids with `item_ids` in `options` parameters.
         // See [http://xmpp.org/extensions/xep-0060.html#subscriber-retrieve](http://xmpp.org/extensions/xep-0060.html#subscriber-retrieve)
+        // Resolves with an array of items.
         // Also if your server supports [Result Set Management](http://xmpp.org/extensions/xep-0059.html)
         // on PubSub nodes, you can pass in options an `rsm` object literal with `before`, `after`, `max` parameters.
         // You cannot specify both `rsm` and `max_items` or `items_ids`.
-        // Resolves an object literal with `items` providing a list of the items retrieved, and `rsm` with `last`,
-        // `first`, `count` properties.
+        // Requesting with `rsm` will resolve with an object literal with `items` providing a list of the items retrieved,
+        //and `rsm` with `last`, `first`, `count` properties.
 
         items: function (node, options) {
             var d = $.Deferred(),
@@ -239,22 +240,22 @@
 
             this._connection.sendIQ(iq.tree(),
                 function (res) {
-                    var rsm = {},
-                        items = _.map($('item', res), function (item) {
+                    var items = _.map($('item', res), function (item) {
                             return item.cloneNode(true);
                         });
 
-                    if ($('set', res).length) {
-                        rsm = {
-                            count: parseInt($('set > count', res).text(), 10),
-                            first: $('set >first', res).text(),
-                            last: $('set > last', res).text()
-                        };
+                    if (options.rsm && $('set', res).length) {
+                        d.resolve({
+                            items: items,
+                            rsm: {
+                                count: parseInt($('set > count', res).text(), 10),
+                                first: $('set >first', res).text(),
+                                last: $('set > last', res).text()
+                            }
+                        });
+                    } else {
+                        d.resolve(items);
                     }
-                    d.resolve({
-                        items: items,
-                        rsm: rsm
-                    });
 
                 }, d.reject);
             return d.promise();
