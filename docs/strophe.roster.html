@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-type" content="text/html;charset=utf-8">
+  <title>strophe.roster.js</title>
+  <link rel="stylesheet" href="pycco.css">
+</head>
+<body>
+<div id="background"></div>
+<div id='container'>
+  <div class='section'>
+    <div class='docs'><h1>strophe.roster.js</h1></div>
+  </div>
+  <div class='clearall'>
+  <div class='section' id='section-0'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-0'>#</a>
+      </div>
+      <p>XMPP plugins for Strophe v0.2</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-1'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-1'>#</a>
+      </div>
+      <p>(c) 2012 Yiorgis Gozadinos.
+   strophe.plugins is distributed under the MIT license.
+   http://github.com/ggozad/strophe.plugins</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-2'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-2'>#</a>
+      </div>
+      <p>Roster plugin partially implementing
+<a href="http://xmpp.org/rfcs/rfc6121.html">Roster management</a> &amp; <a href="http://xmpp.org/extensions/xep-0144.html">Roster Item Exchange</a></p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">root</span><span class="p">,</span> <span class="nx">factory</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">define</span> <span class="o">===</span> <span class="s1">&#39;function&#39;</span> <span class="o">&amp;&amp;</span> <span class="nx">define</span><span class="p">.</span><span class="nx">amd</span><span class="p">)</span> <span class="p">{</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-3'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-3'>#</a>
+      </div>
+      <p>AMD. Register as an anonymous module.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="nx">define</span><span class="p">([</span><span class="s1">&#39;jquery&#39;</span><span class="p">,</span> <span class="s1">&#39;underscore&#39;</span><span class="p">,</span> <span class="s1">&#39;backbone&#39;</span><span class="p">,</span> <span class="s1">&#39;strophe&#39;</span><span class="p">],</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">$</span><span class="p">,</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">Backbone</span><span class="p">,</span> <span class="nx">Strophe</span><span class="p">)</span> <span class="p">{</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-4'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-4'>#</a>
+      </div>
+      <p>Also create a global in case some scripts
+that are loaded still are looking for
+a global even when an AMD loader is in use.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>            <span class="k">return</span> <span class="nx">factory</span><span class="p">(</span><span class="nx">$</span><span class="p">,</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">Backbone</span><span class="p">,</span> <span class="nx">Strophe</span><span class="p">);</span>
+        <span class="p">});</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-5'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-5'>#</a>
+      </div>
+      <p>Browser globals</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="nx">factory</span><span class="p">(</span><span class="nx">root</span><span class="p">.</span><span class="nx">$</span><span class="p">,</span> <span class="nx">root</span><span class="p">.</span><span class="nx">_</span><span class="p">,</span> <span class="nx">root</span><span class="p">.</span><span class="nx">Backbone</span><span class="p">,</span> <span class="nx">root</span><span class="p">.</span><span class="nx">Strophe</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">}(</span><span class="k">this</span><span class="p">,</span><span class="kd">function</span> <span class="p">(</span><span class="nx">$</span><span class="p">,</span> <span class="nx">_</span><span class="p">,</span> <span class="nx">Backbone</span><span class="p">,</span> <span class="nx">Strophe</span><span class="p">)</span> <span class="p">{</span>
+
+    <span class="nx">Strophe</span><span class="p">.</span><span class="nx">addConnectionPlugin</span><span class="p">(</span><span class="s1">&#39;roster&#39;</span><span class="p">,</span> <span class="p">{</span>
+        <span class="nx">_connection</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
+
+        <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">conn</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span> <span class="o">=</span> <span class="nx">conn</span><span class="p">;</span>
+            <span class="nx">Strophe</span><span class="p">.</span><span class="nx">addNamespace</span><span class="p">(</span><span class="s1">&#39;ROSTERX&#39;</span><span class="p">,</span> <span class="s1">&#39;http://jabber.org/protocol/rosterx&#39;</span><span class="p">);</span>
+            <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Events</span><span class="p">);</span>
+        <span class="p">},</span>
+
+        <span class="nx">statusChanged</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">status</span><span class="p">,</span> <span class="nx">condition</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">if</span> <span class="p">(</span><span class="nx">status</span> <span class="o">===</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">CONNECTED</span> <span class="o">||</span> <span class="nx">status</span> <span class="o">===</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">Status</span><span class="p">.</span><span class="nx">ATTACHED</span><span class="p">)</span> <span class="p">{</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-6'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-6'>#</a>
+      </div>
+      <p>Subscribe to Presence</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>                <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">addHandler</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_onReceivePresence</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">),</span> <span class="kc">null</span><span class="p">,</span> <span class="s1">&#39;presence&#39;</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-7'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-7'>#</a>
+      </div>
+      <p>Subscribe to Roster Item exchange messages</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>                <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">addHandler</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_onRosterSuggestion</span><span class="p">.</span><span class="nx">bind</span><span class="p">(</span><span class="k">this</span><span class="p">),</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">NS</span><span class="p">.</span><span class="nx">ROSTERX</span><span class="p">,</span> <span class="s1">&#39;message&#39;</span><span class="p">,</span> <span class="kc">null</span><span class="p">);</span>
+            <span class="p">}</span>
+        <span class="p">},</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-8'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-8'>#</a>
+      </div>
+      <p><strong>get</strong> resolves with a dictionary of the authenticated user's roster.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="nx">get</span><span class="o">:</span> <span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">d</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">(),</span> <span class="nx">roster</span><span class="p">,</span>
+                <span class="nx">iq</span> <span class="o">=</span> <span class="nx">$iq</span><span class="p">({</span><span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;get&#39;</span><span class="p">,</span>  <span class="nx">id</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">getUniqueId</span><span class="p">(</span><span class="s1">&#39;roster&#39;</span><span class="p">)})</span>
+                    <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;query&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">xmlns</span><span class="o">:</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">NS</span><span class="p">.</span><span class="nx">ROSTER</span><span class="p">});</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">sendIQ</span><span class="p">(</span><span class="nx">iq</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">roster</span> <span class="o">=</span> <span class="p">{};</span>
+                <span class="nx">$</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;item&#39;</span><span class="p">,</span> <span class="nx">result</span><span class="p">),</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">roster</span><span class="p">[</span><span class="nx">item</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;jid&#39;</span><span class="p">)]</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="nx">subscription</span><span class="o">:</span> <span class="nx">item</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;subscription&#39;</span><span class="p">),</span>
+                        <span class="nx">name</span><span class="o">:</span> <span class="nx">item</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;name&#39;</span><span class="p">),</span>
+                        <span class="nx">groups</span><span class="o">:</span> <span class="nx">$</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">,</span> <span class="nx">item</span><span class="p">),</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">group</span><span class="p">,</span> <span class="nx">idx</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">$</span><span class="p">(</span><span class="nx">group</span><span class="p">).</span><span class="nx">text</span><span class="p">();</span> <span class="p">})</span>
+                    <span class="p">};</span>
+                <span class="p">});</span>
+                <span class="nx">d</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">roster</span><span class="p">);</span>
+            <span class="p">},</span> <span class="nx">d</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
+            <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
+        <span class="p">},</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p><strong>subscribe</strong> to the user's with JID <code>jid</code> presence</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="nx">subscribe</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">jid</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">$pres</span><span class="p">({</span><span class="nx">to</span><span class="o">:</span> <span class="nx">jid</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;subscribe&quot;</span><span class="p">}));</span>
+        <span class="p">},</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p><strong>unsubscribe</strong> from the user's with JID <code>jid</code> presence</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="nx">unsubscribe</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">jid</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">$pres</span><span class="p">({</span><span class="nx">to</span><span class="o">:</span> <span class="nx">jid</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;unsubscribe&quot;</span><span class="p">}));</span>
+        <span class="p">},</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-11'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-11'>#</a>
+      </div>
+      <p><strong>authorize</strong> the user with JID <code>jid</code> to subscribe to the authenticated user's presence</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="nx">authorize</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">jid</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">$pres</span><span class="p">({</span><span class="nx">to</span><span class="o">:</span> <span class="nx">jid</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;subscribed&quot;</span><span class="p">}));</span>
+        <span class="p">},</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-12'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-12'>#</a>
+      </div>
+      <p><strong>unauthorize</strong> the user with JID <code>jid</code> to subscribe to the authenticated user's presence</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="nx">unauthorize</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">jid</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">$pres</span><span class="p">({</span><span class="nx">to</span><span class="o">:</span> <span class="nx">jid</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="s2">&quot;unsubscribed&quot;</span><span class="p">}));</span>
+        <span class="p">},</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-13'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-13'>#</a>
+      </div>
+      <p><strong>update</strong> the authenticated user's roster. Takes as arguments <code>jid</code> the JID of the user to update,
+<code>name</code> the "nick" given to the user, and <code>groups</code> a list of groups the user belongs to.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="nx">update</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">jid</span><span class="p">,</span> <span class="nx">name</span><span class="p">,</span> <span class="nx">groups</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">d</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">(),</span> <span class="nx">i</span><span class="p">,</span>
+                <span class="nx">iq</span> <span class="o">=</span> <span class="nx">$iq</span><span class="p">({</span><span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">getUniqueId</span><span class="p">(</span><span class="s1">&#39;roster&#39;</span><span class="p">)})</span>
+                    <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;query&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">xmlns</span><span class="o">:</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">NS</span><span class="p">.</span><span class="nx">ROSTER</span><span class="p">})</span>
+                    <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;item&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">jid</span><span class="o">:</span> <span class="nx">jid</span><span class="p">,</span> <span class="nx">name</span><span class="o">:</span> <span class="nx">name</span><span class="p">});</span>
+            <span class="k">for</span> <span class="p">(</span><span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="nx">groups</span><span class="p">.</span><span class="nx">length</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">iq</span><span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;group&#39;</span><span class="p">).</span><span class="nx">t</span><span class="p">(</span><span class="nx">groups</span><span class="p">[</span><span class="nx">i</span><span class="p">]).</span><span class="nx">up</span><span class="p">();</span>
+            <span class="p">}</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">sendIQ</span><span class="p">(</span><span class="nx">iq</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
+            <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
+        <span class="p">},</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-14'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-14'>#</a>
+      </div>
+      <p><strong>_onReceivePresence</strong> will capture all presence events.
+It will re-trigger to subscribers more specific events, see inline comments.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="nx">_onReceivePresence</span> <span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">presence</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">jid</span> <span class="o">=</span> <span class="nx">presence</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;from&#39;</span><span class="p">),</span>
+                <span class="nx">type</span> <span class="o">=</span> <span class="nx">presence</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">),</span>
+                <span class="nx">show</span> <span class="o">=</span> <span class="p">(</span><span class="nx">presence</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;show&#39;</span><span class="p">).</span><span class="nx">length</span> <span class="o">!==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">getText</span><span class="p">(</span><span class="nx">presence</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;show&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
+                <span class="nx">status</span> <span class="o">=</span>  <span class="p">(</span><span class="nx">presence</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">).</span><span class="nx">length</span> <span class="o">!==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">getText</span><span class="p">(</span><span class="nx">presence</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;status&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
+                <span class="nx">priority</span> <span class="o">=</span> <span class="p">(</span><span class="nx">presence</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;priority&#39;</span><span class="p">).</span><span class="nx">length</span> <span class="o">!==</span> <span class="mi">0</span><span class="p">)</span> <span class="o">?</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">getText</span><span class="p">(</span><span class="nx">presence</span><span class="p">.</span><span class="nx">getElementsByTagName</span><span class="p">(</span><span class="s1">&#39;priority&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span> <span class="o">:</span> <span class="kc">null</span><span class="p">;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-15'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-15'>#</a>
+      </div>
+      <p>Always trigger an <code>xmpp:presence</code> event, regardless of the type of the event.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>            <span class="k">this</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;xmpp:presence&#39;</span><span class="p">,</span> <span class="p">{</span>
+                <span class="nx">jid</span><span class="o">:</span> <span class="nx">jid</span><span class="p">,</span>
+                <span class="nx">type</span><span class="o">:</span> <span class="nx">type</span><span class="p">,</span>
+                <span class="nx">show</span><span class="o">:</span> <span class="nx">show</span><span class="p">,</span>
+                <span class="nx">status</span><span class="o">:</span> <span class="nx">status</span><span class="p">,</span>
+                <span class="nx">priority</span><span class="o">:</span> <span class="nx">priority</span>
+            <span class="p">});</span>
+
+            <span class="k">switch</span> <span class="p">(</span><span class="nx">type</span><span class="p">)</span> <span class="p">{</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-16'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-16'>#</a>
+      </div>
+      <p>Trigger an <code>xmpp:presence:available</code> event when a user becomes available.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>                <span class="k">case</span> <span class="kc">null</span><span class="o">:</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;xmpp:presence:available&#39;</span><span class="p">,</span> <span class="p">{</span>
+                        <span class="nx">jid</span><span class="o">:</span> <span class="nx">jid</span><span class="p">,</span>
+                        <span class="nx">show</span><span class="o">:</span> <span class="nx">show</span><span class="p">,</span>
+                        <span class="nx">status</span><span class="o">:</span> <span class="nx">status</span><span class="p">,</span>
+                        <span class="nx">priority</span><span class="o">:</span> <span class="nx">priority</span>
+                    <span class="p">});</span>
+                    <span class="k">break</span><span class="p">;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-17'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-17'>#</a>
+      </div>
+      <p>Trigger an <code>xmpp:presence:unavailable</code> event when a user becomes unavailable.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>                <span class="k">case</span> <span class="s1">&#39;unavailable&#39;</span><span class="o">:</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;xmpp:presence:unavailable&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">jid</span><span class="o">:</span> <span class="nx">jid</span><span class="p">});</span>
+                    <span class="k">break</span><span class="p">;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-18'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-18'>#</a>
+      </div>
+      <p>Trigger an <code>xmpp:presence:subscriptionrequest</code> event when a user requests to subscribe to the
+authenticated user's presence.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>                <span class="k">case</span> <span class="s1">&#39;subscribe&#39;</span><span class="o">:</span>
+                    <span class="k">this</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;xmpp:presence:subscriptionrequest&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">jid</span><span class="o">:</span> <span class="nx">jid</span><span class="p">});</span>
+                    <span class="k">break</span><span class="p">;</span>
+
+                <span class="k">default</span><span class="o">:</span>
+                    <span class="k">break</span><span class="p">;</span>
+            <span class="p">}</span>
+            <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="p">},</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-19'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-19'>#</a>
+      </div>
+      <p><strong>_onRosterSuggestion</strong> captures Roster Item exchange events.
+It will re-trigger to subscribers more specific events, see inline comments.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="nx">_onRosterSuggestion</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">msg</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
+                <span class="nx">from</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">msg</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;from&#39;</span><span class="p">),</span>
+                <span class="nx">suggestion</span><span class="p">,</span>
+                <span class="nx">groups</span><span class="p">;</span>
+
+            <span class="nx">$</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;item&#39;</span><span class="p">,</span> <span class="nx">msg</span><span class="p">),</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">suggestion</span> <span class="o">=</span> <span class="p">{</span><span class="nx">from</span><span class="o">:</span> <span class="nx">from</span><span class="p">};</span>
+                <span class="nx">_</span><span class="p">.</span><span class="nx">each</span><span class="p">(</span><span class="nx">item</span><span class="p">.</span><span class="nx">attributes</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">attr</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">suggestion</span><span class="p">[</span><span class="nx">attr</span><span class="p">.</span><span class="nx">name</span><span class="p">]</span> <span class="o">=</span> <span class="nx">attr</span><span class="p">.</span><span class="nx">value</span><span class="p">;</span>
+                <span class="p">});</span>
+                <span class="nx">groups</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;groups&#39;</span><span class="p">,</span> <span class="nx">item</span><span class="p">),</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">group</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">group</span><span class="p">.</span><span class="nx">textContent</span><span class="p">;});</span>
+                <span class="k">if</span> <span class="p">(</span><span class="nx">groups</span><span class="p">.</span><span class="nx">length</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="nx">suggestion</span><span class="p">.</span><span class="nx">groups</span> <span class="o">=</span> <span class="nx">groups</span><span class="p">;</span>
+                <span class="p">}</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-20'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-20'>#</a>
+      </div>
+      <p>Always trigger an <code>xmpp:roster:suggestion</code> event.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>                <span class="nx">self</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;xmpp:roster:suggestion&#39;</span><span class="p">,</span> <span class="nx">suggestion</span><span class="p">);</span>
+
+                <span class="k">switch</span> <span class="p">(</span><span class="nx">suggestion</span><span class="p">.</span><span class="nx">action</span><span class="p">)</span> <span class="p">{</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-21'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-21'>#</a>
+      </div>
+      <p>Trigger an <code>xmpp:roster:suggestion:add</code> event when a suggestion
+to add a user is received.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>                    <span class="k">case</span> <span class="s1">&#39;add&#39;</span><span class="o">:</span>
+                        <span class="nx">self</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;xmpp:roster:suggestion:add&#39;</span><span class="p">,</span> <span class="nx">suggestion</span><span class="p">);</span>
+                        <span class="k">break</span><span class="p">;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-22'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-22'>#</a>
+      </div>
+      <p>Trigger an <code>xmpp:roster:suggestion:delete</code> event when a suggestion
+to delete a user is received.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>                    <span class="k">case</span> <span class="s1">&#39;delete&#39;</span><span class="o">:</span>
+                        <span class="nx">self</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;xmpp:roster:suggestion:delete&#39;</span><span class="p">,</span> <span class="nx">suggestion</span><span class="p">);</span>
+                        <span class="k">break</span><span class="p">;</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-23'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-23'>#</a>
+      </div>
+      <p>Trigger an <code>xmpp:roster:suggestion:modify</code> event when a suggestion
+to modify a user's properties in the roster is received.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>                    <span class="k">case</span> <span class="s1">&#39;modify&#39;</span><span class="o">:</span>
+                        <span class="nx">self</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;xmpp:roster:suggestion:modify&#39;</span><span class="p">,</span> <span class="nx">suggestion</span><span class="p">);</span>
+                        <span class="k">break</span><span class="p">;</span>
+                    <span class="k">default</span><span class="o">:</span>
+                        <span class="k">break</span><span class="p">;</span>
+                <span class="p">}</span>
+            <span class="p">});</span>
+            <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
+        <span class="p">}</span>
+    <span class="p">});</span>
+<span class="p">}));</span>
+
+</pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+</div>
+</body>
