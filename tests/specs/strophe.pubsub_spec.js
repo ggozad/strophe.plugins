@@ -354,7 +354,7 @@
         });
 
         it('returns the list items of a PubSub node when items() is called', function () {
-            var args;
+            var args, items;
             spyOn(connection, 'send').andCallFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
@@ -378,11 +378,11 @@
             promise.fail(errorHandler);
             expect(errorHandler).wasNotCalled();
             expect(successHandler).toHaveBeenCalled();
-            args = successHandler.argsForCall[0][0];
-            expect(args.length).toEqual(2);
-            expect($(args[0]).attr('id')).toEqual('some_id');
-            expect($('entry', args[0]).attr('some_attr')).toEqual('some_val');
-            expect($(args[0]).text()).toEqual('Hello world.');
+            items = args = successHandler.argsForCall[0][0];
+            expect(items.length).toEqual(2);
+            expect($(items[0]).attr('id')).toEqual('some_id');
+            expect($('entry', items[0]).attr('some_attr')).toEqual('some_val');
+            expect($(items[0]).text()).toEqual('Hello world.');
         });
 
         it('requests a max number of items if items() is called with max_items in its options', function () {
@@ -439,6 +439,43 @@
             promise.fail(errorHandler);
             expect(errorHandler).wasNotCalled();
             expect(successHandler).toHaveBeenCalled();
+        });
+
+        it('returns the list items as well as the Result Management Set of a PubSub node when items() is called with `rsm` parameter', function () {
+            var args, items, rsm;
+            spyOn(connection, 'send').andCallFake(function (request) {
+                request = xmppMocker.jquerify(request);
+                expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
+                expect($('iq', request).attr('type')).toEqual('get');
+                expect($('iq > pubsub', request).attr('xmlns')).toEqual(Strophe.NS.PUBSUB);
+                expect($('iq > pubsub > items', request).attr('node')).toEqual('anode');
+                response = $iq({type: 'result', id: $('iq', request).attr('id')})
+                    .c('pubsub', {xmlns: Strophe.NS.PUBSUB})
+                    .c('items', {node: 'anode'})
+                    .c('item', {id: 'some_id'})
+                    .c('entry', {}, 'Hello world.')
+                    .up().up().up()
+                    .c('set', {xmlns: Strophe.NS.RSM})
+                    .c('first', {}, 'modification@time')
+                    .c('last', {}, 'modification@time')
+                    .c('count', {}, '4')
+                    .tree();
+                xmppMocker.receive(connection, response);
+            });
+            promise = connection.PubSub.items('anode', {rsm: {first: 'modification@time', max: 1}});
+            promise.done(successHandler);
+            promise.fail(errorHandler);
+            expect(errorHandler).wasNotCalled();
+            expect(successHandler).toHaveBeenCalled();
+            args = successHandler.argsForCall[0][0];
+            items = args.items; rsm = args.rsm;
+            expect(items.length).toEqual(1);
+            expect($(items[0]).attr('id')).toEqual('some_id');
+            expect($(items[0]).text()).toEqual('Hello world.');
+            expect(rsm.first).toEqual('modification@time');
+            expect(rsm.last).toEqual('modification@time');
+            expect(rsm.count).toEqual(4);
+
         });
 
         it("subscribes the user's bare JID to a node when subscribe() is called", function () {

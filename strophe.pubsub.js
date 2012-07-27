@@ -40,6 +40,7 @@
             Strophe.addNamespace('PUBSUB_NODE_CONFIG', Strophe.NS.PUBSUB + '#node_config');
             Strophe.addNamespace('ATOM', 'http://www.w3.org/2005/Atom');
             Strophe.addNamespace('DELAY', 'urn:xmpp:delay');
+            Strophe.addNamespace('RSM', 'http://jabber.org/protocol/rsm');
             _.extend(this, Backbone.Events);
         },
 
@@ -230,6 +231,10 @@
             options = options || {};
 
             if (options.rsm) {
+                var rsm = $build('set', {xmlns: Strophe.NS.RSM});
+                _.each(options.rsm, function (val, key) { rsm.c(key, {}, val); });
+                iq.up();
+                iq.cnode(rsm.tree());
             } else if (options.max_items) {
                 iq.attrs({max_items: options.max_items});
             } else if (options.item_ids) {
