@@ -40,6 +40,7 @@
             Strophe.addNamespace('PUBSUB_NODE_CONFIG', Strophe.NS.PUBSUB + '#node_config');
             Strophe.addNamespace('ATOM', 'http://www.w3.org/2005/Atom');
             Strophe.addNamespace('DELAY', 'urn:xmpp:delay');
+            Strophe.addNamespace('RSM', 'http://jabber.org/protocol/rsm');
             _.extend(this, Backbone.Events);
         },
 
@@ -214,6 +215,13 @@
         // Optionally, you can specify `max_items` to retrieve a maximum number of items,
         // or a list of item ids with `item_ids` in `options` parameters.
         // See [http://xmpp.org/extensions/xep-0060.html#subscriber-retrieve](http://xmpp.org/extensions/xep-0060.html#subscriber-retrieve)
+        // Resolves with an array of items.
+        // Also if your server supports [Result Set Management](http://xmpp.org/extensions/xep-0059.html)
+        // on PubSub nodes, you can pass in options an `rsm` object literal with `before`, `after`, `max` parameters.
+        // You cannot specify both `rsm` and `max_items` or `items_ids`.
+        // Requesting with `rsm` will resolve with an object literal with `items` providing a list of the items retrieved,
+        //and `rsm` with `last`, `first`, `count` properties.
+
         items: function (node, options) {
             var d = $.Deferred(),
                 iq = $iq({to: this.service, type: 'get'})
@@ -222,8 +230,14 @@
 
             options = options || {};
 
-            if (options.max_items) iq.attrs({max_items: options.max_items});
-            if (options.item_ids) {
+            if (options.rsm) {
+                var rsm = $build('set', {xmlns: Strophe.NS.RSM});
+                _.each(options.rsm, function (val, key) { rsm.c(key, {}, val); });
+                iq.up();
+                iq.cnode(rsm.tree());
+            } else if (options.max_items) {
+                iq.attrs({max_items: options.max_items});
+            } else if (options.item_ids) {
                 _.each(options.item_ids, function (id) {
                     iq.c('item', {id: id}).up();
                 });
@@ -231,9 +245,23 @@
 
             this._connection.sendIQ(iq.tree(),
                 function (res) {
-                    d.resolve(_.map($('item', res), function (item) {
-                        return item.cloneNode(true);
-                    }));
+                    var items = _.map($('item', res), function (item) {
+                            return item.cloneNode(true);
+                        });
+
+                    if (options.rsm && $('set', res).length) {
+                        d.resolve({
+                            items: items,
+                            rsm: {
+                                count: parseInt($('set > count', res).text(), 10),
+                                first: $('set >first', res).text(),
+                                last: $('set > last', res).text()
+                            }
+                        });
+                    } else {
+                        d.resolve(items);
+                    }
+
                 }, d.reject);
             return d.promise();
         },
