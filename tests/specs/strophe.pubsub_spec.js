@@ -353,7 +353,8 @@
             expect(successHandler).toHaveBeenCalled();
         });
 
-        it('returns the items of a PubSub node', function () {
+        it('returns the list items of a PubSub node when items() is called', function () {
+            var args;
             spyOn(connection, 'send').andCallFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
@@ -377,9 +378,14 @@
             promise.fail(errorHandler);
             expect(errorHandler).wasNotCalled();
             expect(successHandler).toHaveBeenCalled();
+            args = successHandler.argsForCall[0][0];
+            expect(args.length).toEqual(2);
+            expect($(args[0]).attr('id')).toEqual('some_id');
+            expect($('entry', args[0]).attr('some_attr')).toEqual('some_val');
+            expect($(args[0]).text()).toEqual('Hello world.');
         });
 
-        it('will request a max number of items if items() is called with max_items in its options', function () {
+        it('requests a max number of items if items() is called with max_items in its options', function () {
             spyOn(connection, 'send').andCallFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
@@ -406,7 +412,7 @@
             expect(successHandler).toHaveBeenCalled();
         });
 
-        it('will request specific items if items() is called with a list of item ids in its options', function () {
+        it('requests specific items if items() is called with a list of item ids in its options', function () {
             spyOn(connection, 'send').andCallFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
