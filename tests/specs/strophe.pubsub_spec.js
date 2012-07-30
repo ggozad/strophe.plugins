@@ -527,7 +527,25 @@
                 count: 3
             });
         });
-
-
+        
+        it('can transform hyphenated atom keys to camelCase JSON', function () {
+           var entry = $build('entry', {xmlns: Strophe.NS.ATOM})
+                .c('some-key').t('value')
+                .tree();
+            expect(connection.PubSub._AtomToJson(entry)).toEqual({
+                someKey: 'value'
+            });
+        });
+        
+        it('can transform camelCase JSON keys to hyphenated atom', function () {
+            var obj = {
+                'someKey': 'value'
+            }, atom = connection.PubSub._JsonToAtom(obj);
+            var expected = $build('entry', {xmlns: Strophe.NS.ATOM})
+                .c('some-key').t('value')
+                .tree();
+            expect(atom.isEqualNode(expected)).toBeTruthy();
+        });
+        
     });
 })(this.jQuery, this._, this.Backbone, this.Strophe, this.jasmine, this.xmppMocker);
