@@ -370,9 +370,9 @@
                     if ($.isNumeric(val)) {
                         val = Number(val);
                     }
-                    json[el.nodeName.toLowerCase()] = val;
+                    json[el.nodeName] = val;
                 } else {
-                    json[el.nodeName.toLowerCase()] = self._AtomToJson(el);
+                    json[el.nodeName] = self._AtomToJson(el);
                 }
             });
             return json;
