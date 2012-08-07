@@ -331,7 +331,8 @@
 
         // **_JsonToAtom** produces an atom-format XML tree from a JSON object.
         _JsonToAtom: function (obj, tag) {
-            var builder;
+            var builder, 
+                self = this;
 
             if (!tag) {
                 builder = $build('entry', {xmlns: Strophe.NS.ATOM});
@@ -339,6 +340,7 @@
                 builder = $build(tag);
             }
             _.each(obj, function (value, key) {
+                key = self._camelCaseToHyphens(key);
                 if (typeof value === 'string') {
                     builder.c(key, {}, value);
                 } else if (typeof value === 'number') {
@@ -370,12 +372,24 @@
                     if ($.isNumeric(val)) {
                         val = Number(val);
                     }
-                    json[el.nodeName.toLowerCase()] = val;
+                    json[self._hyphensToCamelCase(el.nodeName)] = val;
                 } else {
-                    json[el.nodeName.toLowerCase()] = self._AtomToJson(el);
+                    json[self._hyphensToCamelCase(el.nodeName)] = self._AtomToJson(el);
                 }
             });
             return json;
+        },
+        
+        _camelCaseToHyphens: function(str) {
+            return str.replace(/([a-z][A-Z])/g, function (g) { 
+                return g[0] + '-' + g[1].toLowerCase();
+            });
+        },
+        
+        _hyphensToCamelCase: function(str) {
+            return str.replace(/-([a-z])/g, function (g) { 
+                return g[1].toUpperCase();
+            });
         }
 
     });
