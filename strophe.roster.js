@@ -36,6 +36,8 @@
             if (status === Strophe.Status.CONNECTED || status === Strophe.Status.ATTACHED) {
                 // Subscribe to Presence
                 this._connection.addHandler(this._onReceivePresence.bind(this), null, 'presence', null, null, null);
+                // Subscribe to roster push from the server
+                this._connection.addHandler(this._onRosterSet.bind(this), Strophe.NS.ROSTER, 'iq', 'set');
                 // Subscribe to Roster Item exchange messages
                 this._connection.addHandler(this._onRosterSuggestion.bind(this), Strophe.NS.ROSTERX, 'message', null);
             }
@@ -135,6 +137,21 @@
                 default:
                     break;
             }
+            return true;
+        },
+
+        // ** _onRosterSet** captures roster changes pushed by the server and triggers an `xmpp:roster:set` event.
+        _onRosterSet: function (iq) {
+            var items = $('item', iq);
+            var data = _.map($('item', iq), function (item) {
+                var ritem = _.reduce(item.attributes, function (memo, attr) { memo[attr.name] = attr.value; return memo;}, {});
+                var groups = _.map($('group', item), function (group) { return group.textContent; });
+                if (groups.length) {
+                    ritem.groups = groups;
+                }
+                return ritem;
+            });
+            this.trigger('xmpp:roster:set', data);
             return true;
         },
 

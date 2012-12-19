@@ -148,6 +148,23 @@
                 });
             });
 
+            it('fires an "xmpp:roster:set" when an appropriate iq staza is received', function () {
+
+                var rosterSetHandler = jasmine.createSpy('rosterSetHandler'), iq;
+
+                connection.roster.on('xmpp:roster:set', rosterSetHandler);
+                iq = $iq({from: 'riot.com', type: 'set', id: '123'})
+                    .c('query', {xmlns: Strophe.NS.ROSTER})
+                    .c('item', {jid: 'foo@riot.com', name: 'Foo', subscription: 'none'}).up()
+                    .c('item', {jid: 'bar@riot.com', name: 'Bar', subscription: 'both'})
+                    .c('group').t('foogroup');
+
+                xmppMocker.receive(connection, iq);
+                expect(rosterSetHandler).toHaveBeenCalledWith([
+                    {jid : 'foo@riot.com', name : 'Foo', subscription : 'none' },
+                    {jid : 'bar@riot.com', name : 'Bar', subscription : 'both', groups : ['foogroup']}]);
+            });
+
             it('responds to "Roster Suggested Items" messages', function () {
                 var suggestedHandler = jasmine.createSpy('suggestedHandler'),
                     suggestion = $msg({from: 'foo@riot.com'})
