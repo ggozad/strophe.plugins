@@ -43,7 +43,7 @@
                 var messageHandler = jasmine.createSpy('messageHandler');
                 var msg = $msg({from: 'foo@riot.com', type: 'chat'})
                     .c('body', {}, 'Hello world');
-                connection.Messaging.bind('xmpp:message', messageHandler);
+                connection.Messaging.on('xmpp:message', messageHandler);
                 xmppMocker.receive(connection, msg);
                 expect(messageHandler).toHaveBeenCalledWith({jid: 'foo@riot.com',
                                                              type: 'chat',
@@ -59,7 +59,7 @@
                     .h('<p><a href="http://world.com">Hello</a></p>')
                     .up().up()
                     .c('body', {}, 'Hello world');
-                connection.Messaging.bind('xmpp:message', messageHandler);
+                connection.Messaging.on('xmpp:message', messageHandler);
                 xmppMocker.receive(connection, msg);
                 expect(messageHandler).toHaveBeenCalledWith({jid: 'foo@riot.com',
                                                              type: 'chat',

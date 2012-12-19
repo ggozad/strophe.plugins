@@ -86,8 +86,8 @@
             it('fires an "xmpp:presence:available" and an "xmpp:presence" event when an appropriate presence stanza is received', function () {
                 var presenceHandler = jasmine.createSpy('presenceHandler');
                 var availableHandler = jasmine.createSpy('availableHandler');
-                connection.roster.bind('xmpp:presence', presenceHandler);
-                connection.roster.bind('xmpp:presence:available', availableHandler);
+                connection.roster.on('xmpp:presence', presenceHandler);
+                connection.roster.on('xmpp:presence:available', availableHandler);
                 var presence = $pres({from: 'foo@riot.com'})
                     .c('show', [], 'dnd')
                     .c('status', [], 'Testing...');
@@ -111,8 +111,8 @@
             it('fires an "xmpp:presence:unavailable" and an "xmpp:presence" event when an appropriate presence stanza is received', function () {
                 var presenceHandler = jasmine.createSpy('presenceHandler');
                 var unavailableHandler = jasmine.createSpy('unavailableHandler');
-                connection.roster.bind('xmpp:presence', presenceHandler);
-                connection.roster.bind('xmpp:presence:unavailable', unavailableHandler);
+                connection.roster.on('xmpp:presence', presenceHandler);
+                connection.roster.on('xmpp:presence:unavailable', unavailableHandler);
                 var presence = $pres({from: 'foo@riot.com', type: 'unavailable'});
 
                 xmppMocker.receive(connection, presence);
@@ -131,8 +131,8 @@
             it('fires an "xmpp:presence:subscriptionrequest" and an "xmpp:presence" event when an appropriate presence stanza is received', function () {
                 var presenceHandler = jasmine.createSpy('presenceHandler');
                 var subscriptionHandler = jasmine.createSpy('subscriptionHandler');
-                connection.roster.bind('xmpp:presence', presenceHandler);
-                connection.roster.bind('xmpp:presence:subscriptionrequest', subscriptionHandler);
+                connection.roster.on('xmpp:presence', presenceHandler);
+                connection.roster.on('xmpp:presence:subscriptionrequest', subscriptionHandler);
                 var presence = $pres({from: 'foo@riot.com', type: 'subscribe'});
 
                 xmppMocker.receive(connection, presence);
@@ -170,7 +170,7 @@
                     suggestion = $msg({from: 'foo@riot.com'})
                         .c('x', {xmlns: Strophe.NS.ROSTERX})
                         .c('item');
-                connection.roster.bind('xmpp:roster:suggestion', suggestedHandler);
+                connection.roster.on('xmpp:roster:suggestion', suggestedHandler);
                 xmppMocker.receive(connection, suggestion);
                 expect(suggestedHandler).toHaveBeenCalled();
             });
@@ -182,7 +182,7 @@
                         .c('item', {action: 'add', jid: 'bar@riot.com', name: 'Joe Bar'})
                         .c('groups', {}, 'Rioters')
                         .c('groups', {}, 'Jarnians');
-                connection.roster.bind('xmpp:roster:suggestion:add', suggestedHandler);
+                connection.roster.on('xmpp:roster:suggestion:add', suggestedHandler);
                 xmppMocker.receive(connection, suggestion);
                 expect(suggestedHandler).toHaveBeenCalledWith({from: 'foo@riot.com', action :'add', jid :'bar@riot.com', name :'Joe Bar', groups :['Rioters', 'Jarnians']});
             });
@@ -192,7 +192,7 @@
                     suggestion = $msg({from: 'foo@riot.com'})
                         .c('x', {xmlns: Strophe.NS.ROSTERX})
                         .c('item', {action: 'delete', jid: 'bar@riot.com'});
-                connection.roster.bind('xmpp:roster:suggestion:delete', suggestedHandler);
+                connection.roster.on('xmpp:roster:suggestion:delete', suggestedHandler);
                 xmppMocker.receive(connection, suggestion);
                 expect(suggestedHandler).toHaveBeenCalledWith({from: 'foo@riot.com', action :'delete', jid :'bar@riot.com'});
             });
@@ -203,7 +203,7 @@
                         .c('x', {xmlns: Strophe.NS.ROSTERX})
                         .c('item', {action: 'modify', jid: 'bar@riot.com'})
                         .c('groups', {}, 'Jarnians');
-                connection.roster.bind('xmpp:roster:suggestion:modify', suggestedHandler);
+                connection.roster.on('xmpp:roster:suggestion:modify', suggestedHandler);
                 xmppMocker.receive(connection, suggestion);
                 expect(suggestedHandler).toHaveBeenCalledWith({from: 'foo@riot.com', action :'modify', jid :'bar@riot.com', groups :['Jarnians']});
             });
