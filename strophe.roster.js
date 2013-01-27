@@ -48,7 +48,7 @@
             var d = $.Deferred(), roster,
                 iq = $iq({type: 'get',  id: this._connection.getUniqueId('roster')})
                     .c('query', {xmlns: Strophe.NS.ROSTER});
-            this._connection.sendIQ(iq, function (result) {
+            this._connection.sendIQ(iq.tree(), function (result) {
                 roster = {};
                 $.each($('item', result), function (idx, item) {
                     roster[item.getAttribute('jid')] = {
@@ -92,7 +92,7 @@
             for (i = 0; i < groups.length; i++) {
                 iq.c('group').t(groups[i]).up();
             }
-            this._connection.sendIQ(iq, d.resolve, d.reject);
+            this._connection.sendIQ(iq.tree(), d.resolve, d.reject);
             return d.promise();
         },
 

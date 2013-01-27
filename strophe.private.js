@@ -39,8 +39,8 @@
             var d = $.Deferred(),
                 iq = $iq({ type: 'get', id: this._connection.getUniqueId('private')})
                     .c('query', { xmlns: Strophe.NS.PRIVATE })
-                    .c(key, { xmlns: ns + ':' + key}).tree();
-            this._connection.sendIQ(iq, function (response) {
+                    .c(key, { xmlns: ns + ':' + key});
+            this._connection.sendIQ(iq.tree(), function (response) {
                     var value = $(key + '[xmlns="' + ns + ':' + key + '"] > value', response).text();
                     value = value ? JSON.parse(value) : undefined;
                     d.resolve(value);
@@ -55,9 +55,8 @@
             iq = $iq({type: 'set', id: this._connection.getUniqueId('private')})
                 .c('query', {xmlns: 'jabber:iq:private'})
                 .c(key, {xmlns: ns + ':' + key})
-                .c('value', value)
-                .tree();
-            this._connection.sendIQ(iq, d.resolve, d.reject);
+                .c('value', value);
+            this._connection.sendIQ(iq.tree(), d.resolve, d.reject);
             return d.promise();
         }
     });

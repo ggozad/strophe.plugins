@@ -72,9 +72,9 @@
             var d = $.Deferred(),
                 self = this,
                 iq = $iq({type: 'get', to: jid, id: this._connection.getUniqueId('vCard')})
-                    .c('vCard', {xmlns: Strophe.NS.vCard}).tree();
+                    .c('vCard', {xmlns: Strophe.NS.vCard});
 
-            this._connection.sendIQ(iq, function (response) {
+            this._connection.sendIQ(iq.tree(), function (response) {
                 var result = $('vCard[xmlns="' + Strophe.NS.vCard + '"]', response);
                 if (result.length > 0) {
                     d.resolve(self._parsevCard(result));
@@ -90,7 +90,7 @@
             var d = $.Deferred(),
                 iq = $iq({type: 'set', id: this._connection.getUniqueId('vCard')})
                     .cnode(this._buildvCard(vcard));
-            this._connection.sendIQ(iq, d.resolve, d.reject);
+            this._connection.sendIQ(iq.tree(), d.resolve, d.reject);
             return d.promise();
         },
 

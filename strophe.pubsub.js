@@ -123,7 +123,7 @@
                 form = new Strophe.x.Form({type: 'submit', fields: fields});
                 iq.up().c('configure').cnode(form.toXML());
             }
-            this._connection.sendIQ(iq, d.resolve, d.reject);
+            this._connection.sendIQ(iq.tree(), d.resolve, d.reject);
             return d.promise();
         },
 
@@ -135,7 +135,7 @@
                 .c('pubsub', {xmlns: Strophe.NS.PUBSUB_OWNER})
                 .c('delete', {node: node});
 
-            this._connection.sendIQ(iq, d.resolve, d.reject);
+            this._connection.sendIQ(iq.tree(), d.resolve, d.reject);
             return d.promise();
         },
 
@@ -147,7 +147,7 @@
                     .c('pubsub', {xmlns: Strophe.NS.PUBSUB_OWNER})
                     .c('configure', {node: node}),
                 form;
-            this._connection.sendIQ(iq, function (result) {
+            this._connection.sendIQ(iq.tree(), function (result) {
                 form = Strophe.x.Form.fromXML($('x', result));
                 d.resolve(form.toJSON().fields);
             }, d.reject);
@@ -166,7 +166,7 @@
             } else {
                 iq.c('query', {xmlns: Strophe.NS.DISCO_ITEMS});
             }
-            this._connection.sendIQ(iq,
+            this._connection.sendIQ(iq.tree(),
                 function (result) {
                     d.resolve($.map($('item', result), function (item, idx) { return $(item).attr('node'); }));
                 }, d.reject);
