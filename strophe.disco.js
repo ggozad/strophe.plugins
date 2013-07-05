@@ -37,11 +37,24 @@
 
         // Add Disco handlers
         statusChanged: function (status, condition) {
+            var self = this;
             if (status === Strophe.Status.CONNECTED || status === Strophe.Status.ATTACHED) {
-                this._connection.addHandler(this._onDiscoInfo.bind(this), Strophe.NS>DISCO_INFO, 'iq', 'get', null, null);
+                self._connection.addHandler(self._onDiscoInfo.bind(self), Strophe.NS.DISCO_INFO, 'iq', 'get', null, null);
             }
         },
 
+        // **addIdentity** adds an identity
+        addIdentity: function (identity) {
+            this._identities.push(identity);
+        },
+
+        // **addFeature** adds a feature
+        addFeature: function (feature) {
+            this._features.push(feature);
+        },
+
+        // **info** queries an entity for its support and
+        // returns **identities** and **features
         info: function (to, node) {
             var d = $.Deferred(),
                 query = {xmlns: Strophe.NS.DISCO_INFO},
@@ -70,9 +83,25 @@
             return d.promise();
         },
 
-        // Handle PEP events and trigger own events.
+        // Handle Disco info requests.
         _onDiscoInfo: function (iq) {
 
+            var response = $iq({
+                to: iq.getAttribute('from'),
+                id: iq.getAttribute('id'),
+                type: 'result'})
+                .c('query', {xmlns: Strophe.NS.DISCO_INFO});
+
+            _.each(this._identities, function (identity) {
+                response.c('identity', identity).up();
+            });
+
+            _.each(this._features, function (feature) {
+                response.c('feature', {'var': feature}).up();
+            });
+
+            this._connection.send(response.tree());
+            return true;
         }
 
     });

@@ -40,6 +40,28 @@
                 });
             });
 
+            it('replies with identities and features when a info request is made to the entity', function () {
+                var spy = spyOn(connection, 'send').andCallFake(function (response) {
+                    response = xmppMocker.jquerify(response);
+                    expect($('iq', response).attr('to')).toEqual('foo@bar.com/client');
+                    expect($('iq', response).attr('type')).toEqual('result');
+                    expect($('iq', response).attr('id')).toEqual('foo');
+                    expect($('iq > query', response).attr('xmlns')).toEqual(Strophe.NS.DISCO_INFO);
+                    expect($('iq > query > identity', response).attr('category')).toEqual('client');
+                    expect($('iq > query > identity', response).attr('type')).toEqual('im');
+                    expect($('iq > query > identity', response).attr('name')).toEqual('foo');
+                    expect($('iq > query > feature', response).attr('var')).toEqual('jabber:iq:version');
+
+                });
+                connection.Disco.addIdentity({category: 'client', type: 'im', name: 'foo'});
+                connection.Disco.addFeature('jabber:iq:version');
+
+                request = $iq({from: 'foo@bar.com/client', to: connection.jid, type: 'get', id: 'foo'})
+                    .c('query', {xmlns: Strophe.NS.DISCO_INFO});
+                xmppMocker.receive(connection, request);
+                expect(spy).toHaveBeenCalled();
+            });
+
         });
     });
 })(this.jQuery, this._, this.Backbone, this.Strophe, this.jasmine, this.xmppMocker);
