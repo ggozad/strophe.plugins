@@ -1,4 +1,4 @@
-# XMPP plugins for Strophe v0.2
+# XMPP plugins for Strophe v0.3
 
 A collection of Strophe plugins covering the essential parts of
 
@@ -8,6 +8,7 @@ A collection of Strophe plugins covering the essential parts of
 * [XEP-0054: vcard-temp](http://xmpp.org/extensions/xep-0054.html)
 * [XEP-0049: Private XML storage](http://xmpp.org/extensions/xep-0049.html)
 * [Roster management](http://xmpp.org/rfcs/rfc6121.html) & [Roster Item Exchange](http://xmpp.org/extensions/xep-0144.html)
+* [Service discovery](http://xmpp.org/extensions/xep-0030.html)
 
 ## Documentation
 
@@ -19,6 +20,7 @@ Please refer to the annotated source:
 * [strophe.vcard.js](http://ggozad.com/strophe.plugins/docs/strophe.vcard.html)
 * [strophe.private.js](http://ggozad.com/strophe.plugins/docs/strophe.private.html)
 * [strophe.roster.js](http://ggozad.com/strophe.plugins/docs/strophe.roster.html)
+* [strophe.disco.js]
 
 ## Dependencies
 
@@ -26,7 +28,7 @@ Please refer to the annotated source:
 
 ## License
 
-strophe.plugins is Copyright (C) 2012 Yiorgis Gozadinos.
+strophe.plugins is Copyright (C) 2012-2013 Yiorgis Gozadinos.
 It is distributed under the MIT license.
 
 [Strophe]: http://strophe.im/strophejs
