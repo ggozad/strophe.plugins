@@ -16,7 +16,7 @@
             });
 
             it('can send a plaintext message using send()', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     expect($('message', request).attr('type')).toEqual('chat');
                     expect($('message', request).attr('to')).toEqual('foo@riot.com/home');
@@ -27,7 +27,7 @@
             });
 
             it('can send an xhtml message using send()', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     expect($('message', request).attr('type')).toEqual('chat');
                     expect($('message', request).attr('to')).toEqual('foo@riot.com/home');

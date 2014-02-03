@@ -17,7 +17,7 @@
             });
 
             it('sends a get request when info() is called and returns identities and features', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     expect(request.find('query').attr('xmlns')).toEqual(Strophe.NS.DISCO_INFO);
                     response = $iq({type: 'result', id: $('iq', request).attr('id')})
@@ -41,7 +41,7 @@
             });
 
             it('replies with identities and features when a info request is made to the entity', function () {
-                var spy = spyOn(connection, 'send').andCallFake(function (response) {
+                var spy = spyOn(connection, 'send').and.callFake(function (response) {
                     response = xmppMocker.jquerify(response);
                     expect($('iq', response).attr('to')).toEqual('foo@bar.com/client');
                     expect($('iq', response).attr('type')).toEqual('result');

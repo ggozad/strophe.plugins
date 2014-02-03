@@ -58,7 +58,7 @@
             });
 
             it('can get a vCard and return an object with its properties', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     expect($('iq', request).attr('type')).toEqual('get');
                     expect($('iq', request).attr('to')).toEqual('stpeter@riot.com');
@@ -80,7 +80,7 @@
             });
 
             it('can set a vCard from an dict', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     expect($('iq', request).attr('type')).toEqual('set');
                     expect($('iq > vCard', request).attr('xmlns')).toEqual(Strophe.NS.vCard);
