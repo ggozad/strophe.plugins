@@ -23,7 +23,7 @@
             });
 
             it('sends a set request when set() is called and invokes the success() callback on success', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     response = $iq({type: 'result', id: $('iq', request).attr('id')}).tree();
                     xmppMocker.receive(connection, response);
@@ -34,7 +34,7 @@
             });
 
             it('sends a set request when set() is called and invokes the error() callback on error', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     response = $iq({type: 'error', id: $('iq', request).attr('id')}).tree();
                     xmppMocker.receive(connection, response);
@@ -42,12 +42,12 @@
                 promise = connection.Private.set('mykey', 'http://riot.com/ns/testing', 'myvalue');
                 promise.done(successHandler);
                 promise.fail(errorHandler);
-                expect(successHandler).wasNotCalled();
+                expect(successHandler).not.toHaveBeenCalled();
                 expect(errorHandler).toHaveBeenCalledWith(response);
             });
 
             it('sends a get request when get() is called', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     expect(request.find('query').attr('xmlns')).toEqual(Strophe.NS.PRIVATE);
                     expect(request.find('query mykey').attr('xmlns')).toEqual(ns + ':mykey');
@@ -56,7 +56,7 @@
             });
 
             it('sends a get request when get() is called and invokes the success() callback with the value', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     response = $iq({type: 'result', id: $('iq', request).attr('id')})
                         .c('query', {xmlns: Strophe.NS.PRIVATE})
@@ -71,7 +71,7 @@
             });
 
             it('sends a get request when get() is called and invokes the success() callback with the value "undefined" if the key is not found', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     response = $iq({type: 'result', id: $('iq', request).attr('id')})
                         .c('query', {xmlns: Strophe.NS.PRIVATE})
@@ -85,7 +85,7 @@
             });
 
             it('sends a get request when get() is called and invokes the error() callback on error', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     response = $iq({type: 'error', id: $('iq', request).attr('id')}).tree();
                     xmppMocker.receive(connection, response);
@@ -93,12 +93,12 @@
                 promise = connection.Private.get('somekey', 'http://riot.com/ns/testing');
                 promise.done(successHandler);
                 promise.fail(errorHandler);
-                expect(successHandler).wasNotCalled();
+                expect(successHandler).not.toHaveBeenCalled();
                 expect(errorHandler).toHaveBeenCalledWith(response);
             });
 
             it('stringifies through JSON a js object on set()', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     expect(request.find('query mykey value').text()).toEqual(JSON.stringify({key1: "value1", key2: 2}));
                 });
@@ -106,7 +106,7 @@
             });
 
             it('parses a JSON string and returns the js object on get()', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     response = $iq({type: 'result', id: $('iq', request).attr('id')})
                         .c('query', {xmlns: Strophe.NS.PRIVATE})

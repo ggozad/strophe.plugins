@@ -19,7 +19,7 @@
             });
 
             it('sends a subscription request when subscribe() is called', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     expect($('presence', request).attr('to')).toEqual('foo@riot.com');
                     expect($('presence', request).attr('type')).toEqual('subscribe');
@@ -28,7 +28,7 @@
             });
 
             it('sends an unsubscription request when unsubscribe() is called', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     expect($('presence', request).attr('to')).toEqual('foo@riot.com');
                     expect($('presence', request).attr('type')).toEqual('unsubscribe');
@@ -37,7 +37,7 @@
             });
 
             it('sends an authorize request when authorize() is called', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     expect($('presence', request).attr('to')).toEqual('foo@riot.com');
                     expect($('presence', request).attr('type')).toEqual('subscribed');
@@ -46,7 +46,7 @@
             });
 
             it('sends an unauthorize request when unauthorize() is called', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     expect($('presence', request).attr('to')).toEqual('foo@riot.com');
                     expect($('presence', request).attr('type')).toEqual('unsubscribed');
@@ -55,7 +55,7 @@
             });
 
             it('sends a roster get request when get() is called and invokes the success() callback on success with an object representing the roster', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     response = $iq({type: 'result', id: $('iq', request).attr('id')})
                         .c('query', {xmlns: Strophe.NS.ROSTER})
@@ -71,7 +71,7 @@
             });
 
             it('sends a roster get request when get() is called and invokes the error() callback on error', function () {
-                spyOn(connection, 'send').andCallFake(function (request) {
+                spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     response = $iq({type: 'error', id: $('iq', request).attr('id')}).tree();
                     xmppMocker.receive(connection, response);
@@ -79,7 +79,7 @@
                 promise = connection.roster.get();
                 promise.done(successHandler);
                 promise.fail(errorHandler);
-                expect(successHandler).wasNotCalled();
+                expect(successHandler).not.toHaveBeenCalled();
                 expect(errorHandler).toHaveBeenCalledWith(response);
             });
 

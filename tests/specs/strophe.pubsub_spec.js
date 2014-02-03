@@ -27,13 +27,13 @@
                 .c('entry').t('some_text');
 
             xmppMocker.receive(connection, message);
-            expect(itemPublishedHandler).wasCalled();
-            var argument = itemPublishedHandler.mostRecentCall.args[0];
+
+            var argument = itemPublishedHandler.calls.argsFor(0)[0];
             expect(argument.node).toEqual('anode');
             expect(argument.id).toEqual('some_id');
             expect(argument.entry.isEqualNode($build('entry').t('some_text').tree())).toBeTruthy();
-            expect(itemPublishedOnNodeHandler).wasCalled();
-            expect(lastPublishedHandler).wasNotCalled();
+            expect(itemPublishedOnNodeHandler).toHaveBeenCalled();
+            expect(lastPublishedHandler).not.toHaveBeenCalled();
         });
 
         it('fires a "xmpp:pubsub:item-published" event when a PEP message is received without a payload with an null entry', function () {
@@ -51,13 +51,13 @@
                 .c('item', {id: 'some_id'});
 
             xmppMocker.receive(connection, message);
-            expect(itemPublishedHandler).wasCalled();
-            var argument = itemPublishedHandler.mostRecentCall.args[0];
+            expect(itemPublishedHandler).toHaveBeenCalled();
+            var argument = itemPublishedHandler.calls.argsFor(0)[0];
             expect(argument.node).toEqual('anode');
             expect(argument.id).toEqual('some_id');
             expect(argument.entry).toBeNull();
-            expect(itemPublishedOnNodeHandler).wasCalled();
-            expect(lastPublishedHandler).wasNotCalled();
+            expect(itemPublishedOnNodeHandler).toHaveBeenCalled();
+            expect(lastPublishedHandler).not.toHaveBeenCalled();
         });
 
         it('fires the "xmpp:pubsub:last-published-item" event when a PEP message is received for the last published item', function () {
@@ -76,13 +76,13 @@
                 .c('entry').t('some_text');
             xmppMocker.receive(connection, message);
             expect(lastPublishedHandler).toHaveBeenCalled();
-            var argument = lastPublishedHandler.mostRecentCall.args[0];
+            var argument = lastPublishedHandler.calls.argsFor(0)[0];
             expect(argument.node).toEqual('anode');
             expect(argument.timestamp).toEqual('2011-12-01T10:00:00Z');
             expect(argument.id).toEqual('some_id');
             expect(argument.entry.isEqualNode($build('entry').t('some_text').tree())).toBeTruthy();
             expect(lastPublishedOnNodeHandler).toHaveBeenCalled();
-            expect(itemPublishedHandler).wasNotCalled();
+            expect(itemPublishedHandler).not.toHaveBeenCalled();
         });
 
         it('fires the "xmpp:pubsub:last-published-item" event with a null entry when a PEP message is received without a payload for the last published item', function () {
@@ -100,13 +100,13 @@
                 .c('item', {id: 'some_id'});
             xmppMocker.receive(connection, message);
             expect(lastPublishedHandler).toHaveBeenCalled();
-            var argument = lastPublishedHandler.mostRecentCall.args[0];
+            var argument = lastPublishedHandler.calls.argsFor(0)[0];
             expect(argument.node).toEqual('anode');
             expect(argument.timestamp).toEqual('2011-12-01T10:00:00Z');
             expect(argument.id).toEqual('some_id');
             expect(argument.entry).toBeNull();
             expect(lastPublishedOnNodeHandler).toHaveBeenCalled();
-            expect(itemPublishedHandler).wasNotCalled();
+            expect(itemPublishedHandler).not.toHaveBeenCalled();
         });
 
         it('fires the "xmpp:pubsub:item-deleted" event when a PEP message is received for a retracted item', function () {
@@ -120,7 +120,7 @@
                 .c('retract', {id: 'some_id'});
             xmppMocker.receive(connection, message);
             expect(itemDeletedHandler).toHaveBeenCalled();
-            var argument = itemDeletedHandler.mostRecentCall.args[0];
+            var argument = itemDeletedHandler.calls.argsFor(0)[0];
             expect(argument.node).toEqual('anode');
             expect(argument.id).toEqual('some_id');
             expect(itemDeletedOnNodeHandler).toHaveBeenCalled();
@@ -136,12 +136,12 @@
                 .c('event', {xmlns: Strophe.NS.PUBSUB_EVENT})
                 .c('items', {node: 'anode'});
             xmppMocker.receive(connection, message);
-            expect(lastPublishedHandler).wasNotCalled();
-            expect(itemPublishedHandler).wasNotCalled();
+            expect(lastPublishedHandler).not.toHaveBeenCalled();
+            expect(itemPublishedHandler).not.toHaveBeenCalled();
         });
 
         it('creates a PubSub node with default configuration', function () {
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('set');
@@ -153,12 +153,12 @@
             promise = connection.PubSub.createNode('anode', null);
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalled();
         });
 
         it('creates a PubSub node with custom configuration', function () {
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('set');
@@ -172,12 +172,12 @@
             promise = connection.PubSub.createNode('anode', {'pubsub#title': 'A node', 'pubsub#max_items': 1});
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalled();
         });
 
         it('deletes a PubSub node', function () {
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('set');
@@ -189,12 +189,12 @@
             promise = connection.PubSub.deleteNode('anode');
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalled();
         });
 
         it("returns the node's configuration on calling getNodeConfig()", function () {
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('get');
@@ -214,7 +214,7 @@
             promise = connection.PubSub.getNodeConfig('anode');
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalledWith([{type: 'text-single',
                                                           'var': 'pubsub#title',
                                                           required: false,
@@ -225,7 +225,7 @@
         });
 
         it('returns child nodes of the service on calling discoverNodes() without a node ', function () {
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('get');
@@ -241,12 +241,12 @@
             promise = connection.PubSub.discoverNodes(null);
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalledWith(['anode', 'some_other_node']);
         });
 
         it('returns child nodes of the service on calling discoverNodes() on a node', function () {
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('get');
@@ -262,12 +262,12 @@
             promise = connection.PubSub.discoverNodes('root_node');
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalledWith(['anode', 'some_other_node']);
         });
 
         it('publishes an xml item on a PubSub node', function () {
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('set');
@@ -285,7 +285,7 @@
             promise = connection.PubSub.publish('anode', $build('entry').t('Hello world').tree(), 'some_id');
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalledWith('some_id');
         });
 
@@ -296,7 +296,7 @@
                 published: new Date("June 5, 1974 11:13:00 GMT+0200")
             };
 
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq > pubsub > publish > item', request).attr('id')).toEqual('some_id');
                 expect($('iq > pubsub > publish > item > entry[xmlns="' + Strophe.NS.ATOM + '"]', request).length > 0).toBeTruthy();
@@ -312,12 +312,12 @@
             promise = connection.PubSub.publishAtom('anode', obj, 'some_id');
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalledWith('some_id');
         });
 
         it('deletes an item from a PubSub node', function () {
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('set');
@@ -330,12 +330,12 @@
             promise = connection.PubSub.deleteItem('anode', 'some_id');
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalled();
         });
 
         it('deletes an item from a PubSub node and notifies when notify is set', function () {
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('set');
@@ -349,13 +349,13 @@
             promise = connection.PubSub.deleteItem('anode', 'some_id', true);
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalled();
         });
 
         it('returns the list items of a PubSub node when items() is called', function () {
             var args, items;
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('get');
@@ -376,9 +376,9 @@
             promise = connection.PubSub.items('anode');
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalled();
-            items = args = successHandler.argsForCall[0][0];
+            items = args = successHandler.calls.argsFor(0)[0];
             expect(items.length).toEqual(2);
             expect($(items[0]).attr('id')).toEqual('some_id');
             expect($('entry', items[0]).attr('some_attr')).toEqual('some_val');
@@ -386,7 +386,7 @@
         });
 
         it('requests a max number of items if items() is called with max_items in its options', function () {
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('get');
@@ -408,12 +408,12 @@
             promise = connection.PubSub.items('anode', {max_items: 10});
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalled();
         });
 
         it('requests specific items if items() is called with a list of item ids in its options', function () {
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('get');
@@ -437,13 +437,13 @@
             promise = connection.PubSub.items('anode', {item_ids: ['some_id', 'another_id']});
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalled();
         });
 
         it('returns the list items as well as the Result Management Set of a PubSub node when items() is called with `rsm` parameter', function () {
             var args, items, rsm;
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('get');
@@ -465,9 +465,9 @@
             promise = connection.PubSub.items('anode', {rsm: {first: 'modification@time', max: 1}});
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalled();
-            args = successHandler.argsForCall[0][0];
+            args = successHandler.calls.argsFor(0)[0];
             items = args.items; rsm = args.rsm;
             expect(items.length).toEqual(1);
             expect($(items[0]).attr('id')).toEqual('some_id');
@@ -479,7 +479,7 @@
         });
 
         it("subscribes the user's bare JID to a node when subscribe() is called", function () {
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('set');
@@ -492,12 +492,12 @@
             promise = connection.PubSub.subscribe('anode');
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalled();
         });
 
         it("unsubscribes the user's bare JID from a node when unsubscribe() is called", function () {
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('set');
@@ -511,12 +511,12 @@
             promise = connection.PubSub.unsubscribe('anode', 'sub_id');
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalled();
         });
 
         it("returns the user's subscriptions to the service when getSubscriptions() is called", function () {
-            spyOn(connection, 'send').andCallFake(function (request) {
+            spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('get');
@@ -531,7 +531,7 @@
             promise = connection.PubSub.getSubscriptions();
             promise.done(successHandler);
             promise.fail(errorHandler);
-            expect(errorHandler).wasNotCalled();
+            expect(errorHandler).not.toHaveBeenCalled();
             expect(successHandler).toHaveBeenCalledWith([{jid: connection.jid, node: 'anode', subid: '123', subscription: 'subscribed'}]);
         });
 
