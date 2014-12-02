@@ -41,7 +41,7 @@
                     .c('query', { xmlns: Strophe.NS.PRIVATE })
                     .c(key, { xmlns: ns + ':' + key});
             this._connection.sendIQ(iq.tree(), function (response) {
-                    var value = $(key + '[xmlns="' + ns + ':' + key + '"] > value', response).text();
+                    var value = $(key + ' > value', response).text();
                     value = value ? JSON.parse(value) : undefined;
                     d.resolve(value);
                 }, d.reject);

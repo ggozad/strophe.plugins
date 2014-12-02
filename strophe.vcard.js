@@ -75,7 +75,7 @@
                     .c('vCard', {xmlns: Strophe.NS.vCard});
 
             this._connection.sendIQ(iq.tree(), function (response) {
-                var result = $('vCard[xmlns="' + Strophe.NS.vCard + '"]', response);
+                var result = $('vCard', response);
                 if (result.length > 0) {
                     d.resolve(self._parsevCard(result));
                 } else {

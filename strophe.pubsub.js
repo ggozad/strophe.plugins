@@ -55,7 +55,7 @@
         // Handle PEP events and trigger own events.
         _onReceivePEPEvent: function (ev) {
             var self = this,
-                delay = $('delay[xmlns="' + Strophe.NS.DELAY + '"]', ev).attr('stamp');
+                delay = $('delay', ev).attr('stamp');
             $('item', ev).each(function (idx, item) {
                 var node = $(item).parent().attr('node'),
                     id = $(item).attr('id'),
