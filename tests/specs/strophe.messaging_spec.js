@@ -79,6 +79,17 @@
 
             });
 
+            it('sends a "paused" chat state when compsing() is invoked', function () {
+                spyOn(connection, 'send').and.callFake(function (request) {
+                    request = xmppMocker.jquerify(request);
+                    expect($('message', request).attr('type')).toEqual('chat');
+                    expect($('message', request).attr('to')).toEqual('foo@riot.com/home');
+                    expect($('message > thread', request).text()).toEqual('foo');
+                    expect($('message > paused', request).attr('xmlns')).toEqual(Strophe.NS.CHATSTATES);
+                });
+                connection.Messaging.paused('foo@riot.com/home', 'foo');
+            });
+
         });
     });
 })(this.jQuery, this._, this.Backbone, this.Strophe, this.jasmine, this.xmppMocker);

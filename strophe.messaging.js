@@ -26,6 +26,7 @@
 
         _connection: null,
         composingTimeout: 2000,
+        _currentlyComposing: {},
 
         init: function (conn) {
             this._connection = conn;
@@ -86,6 +87,16 @@
                 msg.c('thread', {}, thread);
             }
             msg.c('composing', {xmlns: Strophe.NS.CHATSTATES});
+            this._connection.send(msg.tree());
+        },
+
+        paused: function (to, thread) {
+            var msg = $msg({to: to, type: 'chat'});
+
+            if (thread) {
+                msg.c('thread', {}, thread);
+            }
+            msg.c('paused', {xmlns: Strophe.NS.CHATSTATES});
             this._connection.send(msg.tree());
         }
 
