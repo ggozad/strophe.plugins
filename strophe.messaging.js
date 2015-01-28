@@ -25,11 +25,13 @@
     Strophe.addConnectionPlugin('Messaging', {
 
         _connection: null,
+        composingTimeout: 2000,
 
         init: function (conn) {
             this._connection = conn;
             Strophe.addNamespace('XHTML_IM', 'http://jabber.org/protocol/xhtml-im');
             Strophe.addNamespace('XHTML', 'http://www.w3.org/1999/xhtml');
+            Strophe.addNamespace('CHATSTATES', 'http://jabber.org/protocol/chatstates');
             _.extend(this, Backbone.Events);
         },
 
@@ -53,10 +55,11 @@
             } else {
                 html_body = null;
             }
-            this.trigger('xmpp:message', {jid: message.getAttribute('from'),
-                                                        type: message.getAttribute('type'),
-                                                        body: body,
-                                                        html_body: html_body});
+            this.trigger('xmpp:message', {
+                jid: message.getAttribute('from'),
+                type: message.getAttribute('type'),
+                body: body,
+                html_body: html_body});
             return true;
         },
 
@@ -73,8 +76,18 @@
                     .c('body', {xmlns: Strophe.NS.XHTML})
                     .h(html_body);
             }
+            this._connection.send(msg.tree());
+        },
 
+        composing: function (to, thread) {
+            var msg = $msg({to: to, type: 'chat'});
+
+            if (thread) {
+                msg.c('thread', {}, thread);
+            }
+            msg.c('composing', {xmlns: Strophe.NS.CHATSTATES});
             this._connection.send(msg.tree());
         }
+
     });
 }));

@@ -67,6 +67,18 @@
                                                              html_body: '<p><a href="http://world.com">Hello</a></p>'});
             });
 
+            it('sends a "composing" chat state when compsing() is invoked', function () {
+                spyOn(connection, 'send').and.callFake(function (request) {
+                    request = xmppMocker.jquerify(request);
+                    expect($('message', request).attr('type')).toEqual('chat');
+                    expect($('message', request).attr('to')).toEqual('foo@riot.com/home');
+                    expect($('message > thread', request).text()).toEqual('foo');
+                    expect($('message > composing', request).attr('xmlns')).toEqual(Strophe.NS.CHATSTATES);
+                });
+                connection.Messaging.composing('foo@riot.com/home', 'foo');
+
+            });
+
         });
     });
 })(this.jQuery, this._, this.Backbone, this.Strophe, this.jasmine, this.xmppMocker);
