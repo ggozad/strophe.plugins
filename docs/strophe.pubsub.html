@@ -17,7 +17,7 @@
       <div class='octowrap'>
         <a class='octothorpe' href='#section-0'>#</a>
       </div>
-      <p>XMPP plugins for Strophe v0.2</p>
+      <p>XMPP plugins for Strophe v1.0.1</p>
     </div>
     <div class='code'>
       <div class="highlight"><pre></pre></div>
@@ -29,7 +29,7 @@
       <div class='octowrap'>
         <a class='octothorpe' href='#section-1'>#</a>
       </div>
-      <p>(c) 2012 Yiorgis Gozadinos.
+      <p>(c) 2012-2013 Yiorgis Gozadinos.
    strophe.plugins is distributed under the MIT license.
    http://github.com/ggozad/strophe.plugins</p>
     </div>
@@ -160,7 +160,7 @@ from <strong>Backbone.Events</strong>.</p>
     <div class='code'>
       <div class="highlight"><pre>        <span class="nx">_onReceivePEPEvent</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">ev</span><span class="p">)</span> <span class="p">{</span>
             <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
-                <span class="nx">delay</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;delay[xmlns=&quot;&#39;</span> <span class="o">+</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">NS</span><span class="p">.</span><span class="nx">DELAY</span> <span class="o">+</span> <span class="s1">&#39;&quot;]&#39;</span><span class="p">,</span> <span class="nx">ev</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;stamp&#39;</span><span class="p">);</span>
+                <span class="nx">delay</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;delay&#39;</span><span class="p">,</span> <span class="nx">ev</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;stamp&#39;</span><span class="p">);</span>
             <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;item&#39;</span><span class="p">,</span> <span class="nx">ev</span><span class="p">).</span><span class="nx">each</span><span class="p">(</span><span class="kd">function</span> <span class="p">(</span><span class="nx">idx</span><span class="p">,</span> <span class="nx">item</span><span class="p">)</span> <span class="p">{</span>
                 <span class="kd">var</span> <span class="nx">node</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">item</span><span class="p">).</span><span class="nx">parent</span><span class="p">().</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;node&#39;</span><span class="p">),</span>
                     <span class="nx">id</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">item</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;id&#39;</span><span class="p">),</span>
@@ -266,7 +266,7 @@ See <a href="http://xmpp.org/extensions/xep-0060.html#owner-create">http://xmpp.
                 <span class="nx">form</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">x</span><span class="p">.</span><span class="nx">Form</span><span class="p">({</span><span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;submit&#39;</span><span class="p">,</span> <span class="nx">fields</span><span class="o">:</span> <span class="nx">fields</span><span class="p">});</span>
                 <span class="nx">iq</span><span class="p">.</span><span class="nx">up</span><span class="p">().</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;configure&#39;</span><span class="p">).</span><span class="nx">cnode</span><span class="p">(</span><span class="nx">form</span><span class="p">.</span><span class="nx">toXML</span><span class="p">());</span>
             <span class="p">}</span>
-            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">sendIQ</span><span class="p">(</span><span class="nx">iq</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">sendIQ</span><span class="p">(</span><span class="nx">iq</span><span class="p">.</span><span class="nx">tree</span><span class="p">(),</span> <span class="nx">d</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
             <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
         <span class="p">},</span></pre></div>
     </div>
@@ -287,7 +287,7 @@ See <a href="http://xmpp.org/extensions/xep-0060.html#owner-delete">http://xmpp.
                 <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;pubsub&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">xmlns</span><span class="o">:</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">NS</span><span class="p">.</span><span class="nx">PUBSUB_OWNER</span><span class="p">})</span>
                 <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;delete&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">node</span><span class="o">:</span> <span class="nx">node</span><span class="p">});</span>
 
-            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">sendIQ</span><span class="p">(</span><span class="nx">iq</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">sendIQ</span><span class="p">(</span><span class="nx">iq</span><span class="p">.</span><span class="nx">tree</span><span class="p">(),</span> <span class="nx">d</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
             <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
         <span class="p">},</span></pre></div>
     </div>
@@ -308,7 +308,7 @@ See <a href="http://xmpp.org/extensions/xep-0060.html#owner-configure">http://xm
                     <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;pubsub&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">xmlns</span><span class="o">:</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">NS</span><span class="p">.</span><span class="nx">PUBSUB_OWNER</span><span class="p">})</span>
                     <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;configure&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">node</span><span class="o">:</span> <span class="nx">node</span><span class="p">}),</span>
                 <span class="nx">form</span><span class="p">;</span>
-            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">sendIQ</span><span class="p">(</span><span class="nx">iq</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">sendIQ</span><span class="p">(</span><span class="nx">iq</span><span class="p">.</span><span class="nx">tree</span><span class="p">(),</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
                 <span class="nx">form</span> <span class="o">=</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">x</span><span class="p">.</span><span class="nx">Form</span><span class="p">.</span><span class="nx">fromXML</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="nx">result</span><span class="p">));</span>
                 <span class="nx">d</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">form</span><span class="p">.</span><span class="nx">toJSON</span><span class="p">().</span><span class="nx">fields</span><span class="p">);</span>
             <span class="p">},</span> <span class="nx">d</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
@@ -336,7 +336,7 @@ See <a href="http://xmpp.org/extensions/xep-0060.html#entity-nodes">http://xmpp.
             <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
                 <span class="nx">iq</span><span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;query&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">xmlns</span><span class="o">:</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">NS</span><span class="p">.</span><span class="nx">DISCO_ITEMS</span><span class="p">});</span>
             <span class="p">}</span>
-            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">sendIQ</span><span class="p">(</span><span class="nx">iq</span><span class="p">,</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">sendIQ</span><span class="p">(</span><span class="nx">iq</span><span class="p">.</span><span class="nx">tree</span><span class="p">(),</span>
                 <span class="kd">function</span> <span class="p">(</span><span class="nx">result</span><span class="p">)</span> <span class="p">{</span>
                     <span class="nx">d</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">$</span><span class="p">.</span><span class="nx">map</span><span class="p">(</span><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;item&#39;</span><span class="p">,</span> <span class="nx">result</span><span class="p">),</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">item</span><span class="p">,</span> <span class="nx">idx</span><span class="p">)</span> <span class="p">{</span> <span class="k">return</span> <span class="nx">$</span><span class="p">(</span><span class="nx">item</span><span class="p">).</span><span class="nx">attr</span><span class="p">(</span><span class="s1">&#39;node&#39;</span><span class="p">);</span> <span class="p">}));</span>
                 <span class="p">},</span> <span class="nx">d</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>

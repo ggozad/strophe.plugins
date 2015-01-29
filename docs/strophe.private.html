@@ -17,7 +17,7 @@
       <div class='octowrap'>
         <a class='octothorpe' href='#section-0'>#</a>
       </div>
-      <p>XMPP plugins for Strophe v0.2</p>
+      <p>XMPP plugins for Strophe v1.0.1</p>
     </div>
     <div class='code'>
       <div class="highlight"><pre></pre></div>
@@ -29,7 +29,7 @@
       <div class='octowrap'>
         <a class='octothorpe' href='#section-1'>#</a>
       </div>
-      <p>(c) 2012 Yiorgis Gozadinos.
+      <p>(c) 2012-2013 Yiorgis Gozadinos.
    strophe.plugins is distributed under the MIT license.
    http://github.com/ggozad/strophe.plugins</p>
     </div>
@@ -117,9 +117,9 @@ or <code>undefined</code> if there is no stored value.</p>
             <span class="kd">var</span> <span class="nx">d</span> <span class="o">=</span> <span class="nx">$</span><span class="p">.</span><span class="nx">Deferred</span><span class="p">(),</span>
                 <span class="nx">iq</span> <span class="o">=</span> <span class="nx">$iq</span><span class="p">({</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;get&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">getUniqueId</span><span class="p">(</span><span class="s1">&#39;private&#39;</span><span class="p">)})</span>
                     <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;query&#39;</span><span class="p">,</span> <span class="p">{</span> <span class="nx">xmlns</span><span class="o">:</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">NS</span><span class="p">.</span><span class="nx">PRIVATE</span> <span class="p">})</span>
-                    <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="p">{</span> <span class="nx">xmlns</span><span class="o">:</span> <span class="nx">ns</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nx">key</span><span class="p">}).</span><span class="nx">tree</span><span class="p">();</span>
-            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">sendIQ</span><span class="p">(</span><span class="nx">iq</span><span class="p">,</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
-                    <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">key</span> <span class="o">+</span> <span class="s1">&#39;[xmlns=&quot;&#39;</span> <span class="o">+</span> <span class="nx">ns</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nx">key</span> <span class="o">+</span> <span class="s1">&#39;&quot;] &gt; value&#39;</span><span class="p">,</span> <span class="nx">response</span><span class="p">).</span><span class="nx">text</span><span class="p">();</span>
+                    <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="p">{</span> <span class="nx">xmlns</span><span class="o">:</span> <span class="nx">ns</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nx">key</span><span class="p">});</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">sendIQ</span><span class="p">(</span><span class="nx">iq</span><span class="p">.</span><span class="nx">tree</span><span class="p">(),</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">response</span><span class="p">)</span> <span class="p">{</span>
+                    <span class="kd">var</span> <span class="nx">value</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="nx">key</span> <span class="o">+</span> <span class="s1">&#39; &gt; value&#39;</span><span class="p">,</span> <span class="nx">response</span><span class="p">).</span><span class="nx">text</span><span class="p">();</span>
                     <span class="nx">value</span> <span class="o">=</span> <span class="nx">value</span> <span class="o">?</span> <span class="nx">JSON</span><span class="p">.</span><span class="nx">parse</span><span class="p">(</span><span class="nx">value</span><span class="p">)</span> <span class="o">:</span> <span class="kc">undefined</span><span class="p">;</span>
                     <span class="nx">d</span><span class="p">.</span><span class="nx">resolve</span><span class="p">(</span><span class="nx">value</span><span class="p">);</span>
                 <span class="p">},</span> <span class="nx">d</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
@@ -142,9 +142,8 @@ or <code>undefined</code> if there is no stored value.</p>
             <span class="nx">iq</span> <span class="o">=</span> <span class="nx">$iq</span><span class="p">({</span><span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;set&#39;</span><span class="p">,</span> <span class="nx">id</span><span class="o">:</span> <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">getUniqueId</span><span class="p">(</span><span class="s1">&#39;private&#39;</span><span class="p">)})</span>
                 <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;query&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">xmlns</span><span class="o">:</span> <span class="s1">&#39;jabber:iq:private&#39;</span><span class="p">})</span>
                 <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="nx">key</span><span class="p">,</span> <span class="p">{</span><span class="nx">xmlns</span><span class="o">:</span> <span class="nx">ns</span> <span class="o">+</span> <span class="s1">&#39;:&#39;</span> <span class="o">+</span> <span class="nx">key</span><span class="p">})</span>
-                <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="nx">value</span><span class="p">)</span>
-                <span class="p">.</span><span class="nx">tree</span><span class="p">();</span>
-            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">sendIQ</span><span class="p">(</span><span class="nx">iq</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
+                <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;value&#39;</span><span class="p">,</span> <span class="nx">value</span><span class="p">);</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">sendIQ</span><span class="p">(</span><span class="nx">iq</span><span class="p">.</span><span class="nx">tree</span><span class="p">(),</span> <span class="nx">d</span><span class="p">.</span><span class="nx">resolve</span><span class="p">,</span> <span class="nx">d</span><span class="p">.</span><span class="nx">reject</span><span class="p">);</span>
             <span class="k">return</span> <span class="nx">d</span><span class="p">.</span><span class="nx">promise</span><span class="p">();</span>
         <span class="p">}</span>
     <span class="p">});</span>

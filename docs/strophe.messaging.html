@@ -17,7 +17,7 @@
       <div class='octowrap'>
         <a class='octothorpe' href='#section-0'>#</a>
       </div>
-      <p>XMPP plugins for Strophe v0.2</p>
+      <p>XMPP plugins for Strophe v1.0.1</p>
     </div>
     <div class='code'>
       <div class="highlight"><pre></pre></div>
@@ -29,7 +29,7 @@
       <div class='octowrap'>
         <a class='octothorpe' href='#section-1'>#</a>
       </div>
-      <p>(c) 2012 Yiorgis Gozadinos.
+      <p>(c) 2012-2013 Yiorgis Gozadinos.
    strophe.plugins is distributed under the MIT license.
    http://github.com/ggozad/strophe.plugins</p>
     </div>
@@ -94,11 +94,14 @@ a global even when an AMD loader is in use.</p>
     <span class="nx">Strophe</span><span class="p">.</span><span class="nx">addConnectionPlugin</span><span class="p">(</span><span class="s1">&#39;Messaging&#39;</span><span class="p">,</span> <span class="p">{</span>
 
         <span class="nx">_connection</span><span class="o">:</span> <span class="kc">null</span><span class="p">,</span>
+        <span class="nx">_composingTimeout</span><span class="o">:</span> <span class="mi">3000</span><span class="p">,</span>
+        <span class="nx">_composing</span><span class="o">:</span> <span class="p">{},</span>
 
         <span class="nx">init</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">conn</span><span class="p">)</span> <span class="p">{</span>
             <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span> <span class="o">=</span> <span class="nx">conn</span><span class="p">;</span>
             <span class="nx">Strophe</span><span class="p">.</span><span class="nx">addNamespace</span><span class="p">(</span><span class="s1">&#39;XHTML_IM&#39;</span><span class="p">,</span> <span class="s1">&#39;http://jabber.org/protocol/xhtml-im&#39;</span><span class="p">);</span>
             <span class="nx">Strophe</span><span class="p">.</span><span class="nx">addNamespace</span><span class="p">(</span><span class="s1">&#39;XHTML&#39;</span><span class="p">,</span> <span class="s1">&#39;http://www.w3.org/1999/xhtml&#39;</span><span class="p">);</span>
+            <span class="nx">Strophe</span><span class="p">.</span><span class="nx">addNamespace</span><span class="p">(</span><span class="s1">&#39;CHATSTATES&#39;</span><span class="p">,</span> <span class="s1">&#39;http://jabber.org/protocol/chatstates&#39;</span><span class="p">);</span>
             <span class="nx">_</span><span class="p">.</span><span class="nx">extend</span><span class="p">(</span><span class="k">this</span><span class="p">,</span> <span class="nx">Backbone</span><span class="p">.</span><span class="nx">Events</span><span class="p">);</span>
         <span class="p">},</span></pre></div>
     </div>
@@ -134,16 +137,17 @@ a global even when an AMD loader is in use.</p>
             <span class="k">if</span> <span class="p">(</span><span class="nx">body</span> <span class="o">===</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="p">{</span>
                 <span class="k">return</span> <span class="kc">true</span><span class="p">;</span> <span class="c1">// Typing notifications are not handled.</span>
             <span class="p">}</span>
-            <span class="nx">html_body</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;html[xmlns=&quot;&#39;</span> <span class="o">+</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">NS</span><span class="p">.</span><span class="nx">XHTML_IM</span> <span class="o">+</span> <span class="s1">&#39;&quot;] &gt; body&#39;</span><span class="p">,</span> <span class="nx">message</span><span class="p">);</span>
+            <span class="nx">html_body</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;html &gt; body&#39;</span><span class="p">,</span> <span class="nx">message</span><span class="p">);</span>
             <span class="k">if</span> <span class="p">(</span><span class="nx">html_body</span><span class="p">.</span><span class="nx">length</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="p">{</span>
                 <span class="nx">html_body</span> <span class="o">=</span> <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;&lt;div&gt;&#39;</span><span class="p">).</span><span class="nx">append</span><span class="p">(</span><span class="nx">html_body</span><span class="p">.</span><span class="nx">contents</span><span class="p">()).</span><span class="nx">html</span><span class="p">();</span>
             <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
                 <span class="nx">html_body</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
             <span class="p">}</span>
-            <span class="k">this</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;xmpp:message&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">jid</span><span class="o">:</span> <span class="nx">message</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;from&#39;</span><span class="p">),</span>
-                                                        <span class="nx">type</span><span class="o">:</span> <span class="nx">message</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">),</span>
-                                                        <span class="nx">body</span><span class="o">:</span> <span class="nx">body</span><span class="p">,</span>
-                                                        <span class="nx">html_body</span><span class="o">:</span> <span class="nx">html_body</span><span class="p">});</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">trigger</span><span class="p">(</span><span class="s1">&#39;xmpp:message&#39;</span><span class="p">,</span> <span class="p">{</span>
+                <span class="nx">jid</span><span class="o">:</span> <span class="nx">message</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;from&#39;</span><span class="p">),</span>
+                <span class="nx">type</span><span class="o">:</span> <span class="nx">message</span><span class="p">.</span><span class="nx">getAttribute</span><span class="p">(</span><span class="s1">&#39;type&#39;</span><span class="p">),</span>
+                <span class="nx">body</span><span class="o">:</span> <span class="nx">body</span><span class="p">,</span>
+                <span class="nx">html_body</span><span class="o">:</span> <span class="nx">html_body</span><span class="p">});</span>
             <span class="k">return</span> <span class="kc">true</span><span class="p">;</span>
         <span class="p">},</span></pre></div>
     </div>
@@ -169,9 +173,73 @@ a global even when an AMD loader is in use.</p>
                     <span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;body&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">xmlns</span><span class="o">:</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">NS</span><span class="p">.</span><span class="nx">XHTML</span><span class="p">})</span>
                     <span class="p">.</span><span class="nx">h</span><span class="p">(</span><span class="nx">html_body</span><span class="p">);</span>
             <span class="p">}</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">tree</span><span class="p">());</span>
+        <span class="p">},</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-9'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-9'>#</a>
+      </div>
+      <p><strong>composing</strong> notifies <code>jid</code> that the user is currently composing a message.
+Pass <code>thread</code> for context and <code>timeout</code> to override the default timeout of 3 seconds.
+Subsequent calls to <strong>composing</strong> will be ignored but reset the timeout.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="nx">composing</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">to</span><span class="p">,</span> <span class="nx">thread</span><span class="p">,</span> <span class="nx">timeout</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">self</span> <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
+                <span class="nx">msg</span><span class="p">,</span> <span class="nx">cIndex</span><span class="p">;</span>
 
+            <span class="nx">cIndex</span> <span class="o">=</span> <span class="nx">thread</span> <span class="o">?</span> <span class="nx">to</span> <span class="o">+</span> <span class="nx">thread</span> <span class="o">:</span> <span class="nx">to</span><span class="p">;</span>
+            <span class="nx">timeout</span> <span class="o">=</span> <span class="nx">timeout</span> <span class="o">||</span> <span class="k">this</span><span class="p">.</span><span class="nx">_composingTimeout</span><span class="p">;</span>
+            <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_composing</span><span class="p">[</span><span class="nx">cIndex</span><span class="p">])</span> <span class="p">{</span>
+                <span class="k">this</span><span class="p">.</span><span class="nx">_composing</span><span class="p">[</span><span class="nx">cIndex</span><span class="p">].</span><span class="nx">call</span><span class="p">();</span>
+                <span class="k">return</span><span class="p">;</span>
+            <span class="p">}</span>
+
+            <span class="k">this</span><span class="p">.</span><span class="nx">_composing</span><span class="p">[</span><span class="nx">cIndex</span><span class="p">]</span> <span class="o">=</span> <span class="nx">_</span><span class="p">.</span><span class="nx">debounce</span><span class="p">(</span><span class="kd">function</span> <span class="p">()</span> <span class="p">{</span>
+                <span class="nx">self</span><span class="p">.</span><span class="nx">_paused</span><span class="p">(</span><span class="nx">to</span><span class="p">,</span> <span class="nx">thread</span><span class="p">);</span>
+            <span class="p">},</span> <span class="nx">timeout</span><span class="p">);</span>
+
+            <span class="nx">msg</span> <span class="o">=</span> <span class="nx">$msg</span><span class="p">({</span><span class="nx">to</span><span class="o">:</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;chat&#39;</span><span class="p">});</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nx">thread</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">msg</span><span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;thread&#39;</span><span class="p">,</span> <span class="p">{},</span> <span class="nx">thread</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="nx">msg</span><span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;composing&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">xmlns</span><span class="o">:</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">NS</span><span class="p">.</span><span class="nx">CHATSTATES</span><span class="p">});</span>
+            <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">tree</span><span class="p">());</span>
+        <span class="p">},</span></pre></div>
+    </div>
+  </div>
+  <div class='clearall'></div>
+  <div class='section' id='section-10'>
+    <div class='docs'>
+      <div class='octowrap'>
+        <a class='octothorpe' href='#section-10'>#</a>
+      </div>
+      <p><strong>_paused</strong> is internally used to mark the end of message composition, see <strong>composing</strong>.</p>
+    </div>
+    <div class='code'>
+      <div class="highlight"><pre>        <span class="nx">_paused</span><span class="o">:</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">to</span><span class="p">,</span> <span class="nx">thread</span><span class="p">)</span> <span class="p">{</span>
+            <span class="kd">var</span> <span class="nx">msg</span><span class="p">,</span> <span class="nx">cIndex</span><span class="p">;</span>
+
+            <span class="nx">cIndex</span> <span class="o">=</span> <span class="nx">thread</span> <span class="o">?</span> <span class="nx">to</span> <span class="o">+</span> <span class="nx">thread</span> <span class="o">:</span> <span class="nx">to</span><span class="p">;</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">_composing</span><span class="p">[</span><span class="nx">cIndex</span><span class="p">])</span> <span class="p">{</span>
+                <span class="k">delete</span> <span class="k">this</span><span class="p">.</span><span class="nx">_composing</span><span class="p">[</span><span class="nx">cIndex</span><span class="p">];</span>
+            <span class="p">}</span>
+
+            <span class="nx">msg</span> <span class="o">=</span> <span class="nx">$msg</span><span class="p">({</span><span class="nx">to</span><span class="o">:</span> <span class="nx">to</span><span class="p">,</span> <span class="nx">type</span><span class="o">:</span> <span class="s1">&#39;chat&#39;</span><span class="p">});</span>
+
+            <span class="k">if</span> <span class="p">(</span><span class="nx">thread</span><span class="p">)</span> <span class="p">{</span>
+                <span class="nx">msg</span><span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;thread&#39;</span><span class="p">,</span> <span class="p">{},</span> <span class="nx">thread</span><span class="p">);</span>
+            <span class="p">}</span>
+            <span class="nx">msg</span><span class="p">.</span><span class="nx">c</span><span class="p">(</span><span class="s1">&#39;paused&#39;</span><span class="p">,</span> <span class="p">{</span><span class="nx">xmlns</span><span class="o">:</span> <span class="nx">Strophe</span><span class="p">.</span><span class="nx">NS</span><span class="p">.</span><span class="nx">CHATSTATES</span><span class="p">});</span>
             <span class="k">this</span><span class="p">.</span><span class="nx">_connection</span><span class="p">.</span><span class="nx">send</span><span class="p">(</span><span class="nx">msg</span><span class="p">.</span><span class="nx">tree</span><span class="p">());</span>
         <span class="p">}</span>
+
     <span class="p">});</span>
 <span class="p">}));</span>
 
