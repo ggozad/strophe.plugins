@@ -25,11 +25,14 @@
     Strophe.addConnectionPlugin('Messaging', {
 
         _connection: null,
+        _composingTimeout: 3000,
+        _composing: {},
 
         init: function (conn) {
             this._connection = conn;
             Strophe.addNamespace('XHTML_IM', 'http://jabber.org/protocol/xhtml-im');
             Strophe.addNamespace('XHTML', 'http://www.w3.org/1999/xhtml');
+            Strophe.addNamespace('CHATSTATES', 'http://jabber.org/protocol/chatstates');
             _.extend(this, Backbone.Events);
         },
 
@@ -53,10 +56,11 @@
             } else {
                 html_body = null;
             }
-            this.trigger('xmpp:message', {jid: message.getAttribute('from'),
-                                                        type: message.getAttribute('type'),
-                                                        body: body,
-                                                        html_body: html_body});
+            this.trigger('xmpp:message', {
+                jid: message.getAttribute('from'),
+                type: message.getAttribute('type'),
+                body: body,
+                html_body: html_body});
             return true;
         },
 
@@ -73,8 +77,54 @@
                     .c('body', {xmlns: Strophe.NS.XHTML})
                     .h(html_body);
             }
+            this._connection.send(msg.tree());
+        },
 
+        // **composing** notifies ``jid`` that the user is currently composing a message.
+        // Pass ``thread`` for context and ``timeout`` to override the default timeout of 3 seconds.
+        // Subsequent calls to **composing** will be ignored but reset the timeout.
+        composing: function (to, thread, timeout) {
+            var self = this,
+                msg, cIndex;
+
+            cIndex = thread ? to + thread : to;
+            timeout = timeout || this._composingTimeout;
+            if (this._composing[cIndex]) {
+                this._composing[cIndex].call();
+                return;
+            }
+
+            this._composing[cIndex] = _.debounce(function () {
+                self._paused(to, thread);
+            }, timeout);
+
+            msg = $msg({to: to, type: 'chat'});
+
+            if (thread) {
+                msg.c('thread', {}, thread);
+            }
+            msg.c('composing', {xmlns: Strophe.NS.CHATSTATES});
+            this._connection.send(msg.tree());
+        },
+
+        // **_paused** is internally used to mark the end of message composition, see **composing**.
+        _paused: function (to, thread) {
+            var msg, cIndex;
+
+            cIndex = thread ? to + thread : to;
+
+            if (this._composing[cIndex]) {
+                delete this._composing[cIndex];
+            }
+
+            msg = $msg({to: to, type: 'chat'});
+
+            if (thread) {
+                msg.c('thread', {}, thread);
+            }
+            msg.c('paused', {xmlns: Strophe.NS.CHATSTATES});
             this._connection.send(msg.tree());
         }
+
     });
 }));

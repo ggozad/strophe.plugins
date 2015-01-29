@@ -67,6 +67,37 @@
                                                              html_body: '<p><a href="http://world.com">Hello</a></p>'});
             });
 
+            it('sends a "composing" chat state when compsing() is invoked', function () {
+                spyOn(connection, 'send').and.callFake(function (request) {
+                    request = xmppMocker.jquerify(request);
+                    expect($('message', request).attr('type')).toEqual('chat');
+                    expect($('message', request).attr('to')).toEqual('foo@riot.com/home');
+                    expect($('message > thread', request).text()).toEqual('foo');
+                    expect($('message > composing', request).attr('xmlns')).toEqual(Strophe.NS.CHATSTATES);
+                });
+                connection.Messaging.composing('foo@riot.com/home', 'foo');
+            });
+
+            it('will send only one "composing" chat state when compsing() is invoked multiple times and send a "paused" after timeout', function (done) {
+                var calls = 0;
+                spyOn(connection, 'send').and.callFake(function (request) {
+                    request = xmppMocker.jquerify(request);
+                    if ($('message > composing', request).length > 0) {
+                        calls++;
+                    }
+                    if ($('message > paused', request).length > 0) {
+                        expect($('message', request).attr('type')).toEqual('chat');
+                        expect($('message', request).attr('to')).toEqual('foo@riot.com/home');
+                        expect($('message > thread', request).text()).toEqual('bar');
+                        expect(calls).toEqual(1);
+                        done();
+                    }
+                });
+                connection.Messaging.composing('foo@riot.com/home', 'bar', 100);
+                connection.Messaging.composing('foo@riot.com/home', 'bar', 100);
+                connection.Messaging.composing('foo@riot.com/home', 'bar', 100);
+            });
+
         });
     });
 })(this.jQuery, this._, this.Backbone, this.Strophe, this.jasmine, this.xmppMocker);
