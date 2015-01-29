@@ -1,4 +1,4 @@
-# XMPP plugins for Strophe v1.0.1
+# XMPP plugins for Strophe v1.0.3
 
 A collection of Strophe plugins covering the essential parts of
 
