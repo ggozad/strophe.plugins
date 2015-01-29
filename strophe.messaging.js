@@ -47,9 +47,27 @@
         _onReceiveChatMessage: function (message) {
             var body, html_body;
             body = $(message).children('body').text();
+
+            if ($('composing', message).length > 0) {
+                this.trigger('xmpp:composing', {
+                    jid: message.getAttribute('from'),
+                    thread: $('thread', message).text()
+                });
+                return true;
+            }
+
+            if ($('paused', message).length > 0) {
+                this.trigger('xmpp:paused', {
+                    jid: message.getAttribute('from'),
+                    thread: $('thread', message).text()
+                });
+                return true;
+            }
+
             if (body === '') {
                 return true; // Typing notifications are not handled.
             }
+
             html_body = $('html > body', message);
             if (html_body.length > 0) {
                 html_body = $('<div>').append(html_body.contents()).html();
