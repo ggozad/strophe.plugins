@@ -26,7 +26,7 @@
 
         _connection: null,
         composingTimeout: 2000,
-        _currentlyComposing: {},
+        _composing: {},
 
         init: function (conn) {
             this._connection = conn;
@@ -81,7 +81,20 @@
         },
 
         composing: function (to, thread) {
-            var msg = $msg({to: to, type: 'chat'});
+            var self = this,
+                msg, cIndex;
+            cIndex = thread ? to + thread : to;
+
+            if (this._composing[cIndex]) {
+                this._composing[cIndex].call();
+                return;
+            }
+
+            this._composing[cIndex] = _.debounce(function () {
+                self._paused(to, thread);
+            });
+
+            msg = $msg({to: to, type: 'chat'});
 
             if (thread) {
                 msg.c('thread', {}, thread);
@@ -90,8 +103,16 @@
             this._connection.send(msg.tree());
         },
 
-        paused: function (to, thread) {
-            var msg = $msg({to: to, type: 'chat'});
+        _paused: function (to, thread) {
+            var msg, cIndex;
+
+            cIndex = thread ? to + thread : to;
+
+            if (this._composing[cIndex]) {
+                delete this._composing[cIndex];
+            }
+
+            msg = $msg({to: to, type: 'chat'});
 
             if (thread) {
                 msg.c('thread', {}, thread);

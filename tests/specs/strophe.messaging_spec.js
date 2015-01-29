@@ -76,18 +76,26 @@
                     expect($('message > composing', request).attr('xmlns')).toEqual(Strophe.NS.CHATSTATES);
                 });
                 connection.Messaging.composing('foo@riot.com/home', 'foo');
-
             });
 
-            it('sends a "paused" chat state when compsing() is invoked', function () {
+            it('will send only one "composing" chat state when compsing() is invoked multiple times and send a "paused" after timeout', function (done) {
+                var calls = 0;
                 spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
-                    expect($('message', request).attr('type')).toEqual('chat');
-                    expect($('message', request).attr('to')).toEqual('foo@riot.com/home');
-                    expect($('message > thread', request).text()).toEqual('foo');
-                    expect($('message > paused', request).attr('xmlns')).toEqual(Strophe.NS.CHATSTATES);
+                    if ($('message > composing', request).length > 0) {
+                        calls++;
+                    }
+                    if ($('message > paused', request).length > 0) {
+                        expect($('message', request).attr('type')).toEqual('chat');
+                        expect($('message', request).attr('to')).toEqual('foo@riot.com/home');
+                        expect($('message > thread', request).text()).toEqual('bar');
+                        expect(calls).toEqual(1);
+                        done();
+                    }
                 });
-                connection.Messaging.paused('foo@riot.com/home', 'foo');
+                connection.Messaging.composing('foo@riot.com/home', 'bar');
+                connection.Messaging.composing('foo@riot.com/home', 'bar');
+                connection.Messaging.composing('foo@riot.com/home', 'bar');
             });
 
         });
