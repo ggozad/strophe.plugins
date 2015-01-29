@@ -93,9 +93,9 @@
                         done();
                     }
                 });
-                connection.Messaging.composing('foo@riot.com/home', 'bar');
-                connection.Messaging.composing('foo@riot.com/home', 'bar');
-                connection.Messaging.composing('foo@riot.com/home', 'bar');
+                connection.Messaging.composing('foo@riot.com/home', 'bar', 100);
+                connection.Messaging.composing('foo@riot.com/home', 'bar', 100);
+                connection.Messaging.composing('foo@riot.com/home', 'bar', 100);
             });
 
         });

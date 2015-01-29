@@ -25,7 +25,7 @@
     Strophe.addConnectionPlugin('Messaging', {
 
         _connection: null,
-        composingTimeout: 2000,
+        _composingTimeout: 3000,
         _composing: {},
 
         init: function (conn) {
@@ -80,11 +80,15 @@
             this._connection.send(msg.tree());
         },
 
-        composing: function (to, thread) {
+        // **composing** notifies ``jid`` that the user is currently composing a message.
+        // Pass ``thread`` for context and ``timeout`` to override the default timeout of 3 seconds.
+        // Subsequent calls to **composing** will be ignored but reset the timeout.
+        composing: function (to, thread, timeout) {
             var self = this,
                 msg, cIndex;
-            cIndex = thread ? to + thread : to;
 
+            cIndex = thread ? to + thread : to;
+            timeout = timeout || this._composingTimeout;
             if (this._composing[cIndex]) {
                 this._composing[cIndex].call();
                 return;
@@ -92,7 +96,7 @@
 
             this._composing[cIndex] = _.debounce(function () {
                 self._paused(to, thread);
-            });
+            }, timeout);
 
             msg = $msg({to: to, type: 'chat'});
 
@@ -103,6 +107,7 @@
             this._connection.send(msg.tree());
         },
 
+        // **_paused** is internally used to mark the end of message composition, see **composing**.
         _paused: function (to, thread) {
             var msg, cIndex;
 
