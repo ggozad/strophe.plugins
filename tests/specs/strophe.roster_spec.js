@@ -89,22 +89,24 @@
                 connection.roster.on('xmpp:presence', presenceHandler);
                 connection.roster.on('xmpp:presence:available', availableHandler);
                 var presence = $pres({from: 'foo@riot.com'})
-                    .c('show', [], 'dnd')
-                    .c('status', [], 'Testing...');
-
+                    .c('show', [], 'away')
+                    .c('status', [], 'Testing...')
+                    .c('query', {xmlns: Strophe.NS.LAST, seconds: '3200'});
                 xmppMocker.receive(connection, presence);
                 expect(presenceHandler).toHaveBeenCalledWith({
                     jid: "foo@riot.com",
                     priority: null,
-                    show: "dnd",
+                    show: "away",
                     status: "Testing...",
+                    last: "3200",
                     type: null
                 });
                 expect(availableHandler).toHaveBeenCalledWith({
                     jid: "foo@riot.com",
                     priority: null,
-                    show: "dnd",
-                    status: "Testing..."
+                    show: "away",
+                    status: "Testing...",
+                    last: "3200"
                 });
             });
 
@@ -121,7 +123,8 @@
                     priority: null,
                     show: null,
                     status: null,
-                    type: 'unavailable'
+                    type: 'unavailable',
+                    last: null
                 });
                 expect(unavailableHandler).toHaveBeenCalledWith({
                     jid: "foo@riot.com"
@@ -141,7 +144,8 @@
                     priority: null,
                     show: null,
                     status: null,
-                    type: 'subscribe'
+                    type: 'subscribe',
+                    last: null
                 });
                 expect(subscriptionHandler).toHaveBeenCalledWith({
                     jid: "foo@riot.com"

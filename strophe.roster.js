@@ -29,6 +29,7 @@
         init: function (conn) {
             this._connection = conn;
             Strophe.addNamespace('ROSTERX', 'http://jabber.org/protocol/rosterx');
+            Strophe.addNamespace('LAST', 'jabber:iq:last');
             _.extend(this, Backbone.Events);
         },
 
@@ -103,7 +104,8 @@
                 type = presence.getAttribute('type'),
                 show = (presence.getElementsByTagName('show').length !== 0) ? Strophe.getText(presence.getElementsByTagName('show')[0]) : null,
                 status =  (presence.getElementsByTagName('status').length !== 0) ? Strophe.getText(presence.getElementsByTagName('status')[0]) : null,
-                priority = (presence.getElementsByTagName('priority').length !== 0) ? Strophe.getText(presence.getElementsByTagName('priority')[0]) : null;
+                priority = (presence.getElementsByTagName('priority').length !== 0) ? Strophe.getText(presence.getElementsByTagName('priority')[0]) : null,
+                last = $('query[xmlns="jabber:iq:last"]', presence).length !==0 ? $('query[xmlns="jabber:iq:last"]', presence).attr('seconds') :  null;
 
             // Always trigger an `xmpp:presence` event, regardless of the type of the event.
             this.trigger('xmpp:presence', {
@@ -111,7 +113,8 @@
                 type: type,
                 show: show,
                 status: status,
-                priority: priority
+                priority: priority,
+                last: last
             });
 
             switch (type) {
@@ -121,7 +124,8 @@
                         jid: jid,
                         show: show,
                         status: status,
-                        priority: priority
+                        priority: priority,
+                        last: last
                     });
                     break;
                 // Trigger an `xmpp:presence:unavailable` event when a user becomes unavailable.
