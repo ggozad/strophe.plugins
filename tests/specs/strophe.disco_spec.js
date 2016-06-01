@@ -20,7 +20,7 @@
                 spyOn(connection, 'send').and.callFake(function (request) {
                     request = xmppMocker.jquerify(request);
                     expect(request.find('query').attr('xmlns')).toEqual(Strophe.NS.DISCO_INFO);
-                    response = $iq({type: 'result', id: $('iq', request).attr('id')})
+                    response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'entity'})
                         .c('query', {xmlns: Strophe.NS.DISCO_INFO})
                         .c('identity', {category: 'pubsub', type: 'pep'}).up()
                         .c('identity', {category: 'server', type: 'im', name: 'foo'}).up()
