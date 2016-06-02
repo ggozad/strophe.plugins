@@ -11,17 +11,17 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['jquery', 'underscore', 'backbone', 'strophe'], function ($, _, Backbone, Strophe) {
+        define(['jquery', 'underscore', 'backbone', 'strophe'], function ($, _, Backbone, wrapper) {
             // Also create a global in case some scripts
             // that are loaded still are looking for
             // a global even when an AMD loader is in use.
-            return factory($, _, Backbone, Strophe);
+            return factory($, _, Backbone, wrapper.Strophe, wrapper.$build, wrapper.$iq);
         });
     } else {
         // Browser globals
-        factory(root.$, root._, root.Backbone, root.Strophe);
+        factory(root.$, root._, root.Backbone, root.Strophe, root.$build, root.$iq);
     }
-}(this,function ($, _, Backbone, Strophe) {
+}(this,function ($, _, Backbone, Strophe, $build, $iq) {
 
     // Add the **PubSub** plugin to Strophe
     Strophe.addConnectionPlugin('PubSub', {
