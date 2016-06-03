@@ -12,18 +12,21 @@
     "backbone"
   ],
   "dependencies": {
-    "jquery": "",
-    "underscore": "",
-    "backbone": "",
-    "strophe": ""
+    "jquery": "^2.2.4",
+    "underscore": "^1.8.3",
+    "backbone": "^1.3.3",
+    "strophejs": "^1.2.5"
   },
   "devDependencies": {
-    "jasmine": ""
+    "jasmine": "^2.4.1"
   },
   "license": "MIT",
   "ignore": [
     "**/.*",
     "bower_components",
     "tests"
-  ]
+  ],
+  "resolutions": {
+    "jquery": "^2.2.4"
+  }
 }

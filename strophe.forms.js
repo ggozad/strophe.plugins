@@ -11,17 +11,17 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['jquery', 'underscore', 'strophe'], function ($, _, Strophe) {
+        define(['jquery', 'underscore', 'strophe'], function ($, _, wrapper) {
             // Also create a global in case some scripts
             // that are loaded still are looking for
             // a global even when an AMD loader is in use.
-            return (Strophe.x = factory($, _, Strophe));
+            return (wrapper.Strophe.x = factory($, _, wrapper.Strophe, wrapper.$build));
         });
     } else {
         // Browser globals
-        Strophe.x = factory(root.$, root._, root.Strophe);
+        root.Strophe.x = factory(root.$, root._, root.Strophe, root.$build);
     }
-}(this,function ($, _, Strophe) {
+}(this,function ($, _, Strophe, $build) {
 
     // **Option** contructor
     var Option = function (opts) {
@@ -88,7 +88,7 @@
                 'var': this['var']
             };
             if (this.label) attrs.label = this.label;
-            xml = $build('field', attrs);
+            var xml = $build('field', attrs);
             if (this.desc) xml.c('desc').t(this.desc).up();
             if (this.required) xml.c('required').up();
             _.each(this.values, function (value) {

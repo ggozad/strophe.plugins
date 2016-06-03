@@ -141,13 +141,14 @@
         });
 
         it('creates a PubSub node with default configuration', function () {
+
             spyOn(connection, 'send').and.callFake(function (request) {
                 request = xmppMocker.jquerify(request);
                 expect($('iq', request).attr('to')).toEqual(connection.PubSub.service);
                 expect($('iq', request).attr('type')).toEqual('set');
                 expect($('iq > pubsub', request).attr('xmlns')).toEqual(Strophe.NS.PUBSUB);
                 expect($('iq > pubsub > create', request).attr('node')).toEqual('anode');
-                response = $iq({type: 'result', id: $('iq', request).attr('id')});
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'});
                 xmppMocker.receive(connection, response);
             });
             promise = connection.PubSub.createNode('anode', null);
@@ -166,7 +167,7 @@
                 expect($('iq > pubsub > create', request).attr('node')).toEqual('anode');
                 expect($('iq > pubsub > configure > x > field[var="pubsub#title"] > value', request).text()).toEqual('A node');
                 expect($('iq > pubsub > configure > x > field[var="pubsub#max_items"] > value', request).text()).toEqual('1');
-                response = $iq({type: 'result', id: $('iq', request).attr('id')});
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'});
                 xmppMocker.receive(connection, response);
             });
             promise = connection.PubSub.createNode('anode', {'pubsub#title': 'A node', 'pubsub#max_items': 1});
@@ -183,7 +184,7 @@
                 expect($('iq', request).attr('type')).toEqual('set');
                 expect($('iq > pubsub', request).attr('xmlns')).toEqual(Strophe.NS.PUBSUB_OWNER);
                 expect($('iq > pubsub > delete', request).attr('node')).toEqual('anode');
-                response = $iq({type: 'result', id: $('iq', request).attr('id')});
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'});
                 xmppMocker.receive(connection, response);
             });
             promise = connection.PubSub.deleteNode('anode');
@@ -204,7 +205,7 @@
                                                fields: [new Strophe.x.Field({'var': 'pubsub#title',
                                                                              'type': 'text-single',
                                                                              'label': 'A friendly name for the node'})]});
-                response = $iq({type: 'result', id: $('iq', request).attr('id')})
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'})
                     .c('pubsub', {xmlns: Strophe.NS.PUBSUB_OWNER})
                     .c('configure', {node: 'anode'})
                     .cnode(form.toXML())
@@ -231,7 +232,7 @@
                 expect($('iq', request).attr('type')).toEqual('get');
                 expect($('iq > query', request).attr('xmlns')).toEqual(Strophe.NS.DISCO_ITEMS);
                 expect($('iq > query', request).attr('node')).toBeUndefined();
-                response = $iq({type: 'result', id: $('iq', request).attr('id')})
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'})
                     .c('query', {xmlns: Strophe.NS.DISCO_ITEMS})
                     .c('item', {jid: connection.PubSub.service, node: 'anode'}).up()
                     .c('item', {jid: connection.PubSub.service, node: 'some_other_node'})
@@ -252,7 +253,7 @@
                 expect($('iq', request).attr('type')).toEqual('get');
                 expect($('iq > query', request).attr('xmlns')).toEqual(Strophe.NS.DISCO_ITEMS);
                 expect($('iq > query', request).attr('node')).toEqual('root_node');
-                response = $iq({type: 'result', id: $('iq', request).attr('id')})
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'})
                     .c('query', {xmlns: Strophe.NS.DISCO_ITEMS, node: 'root_node'})
                     .c('item', {jid: connection.PubSub.service, node: 'anode'}).up()
                     .c('item', {jid: connection.PubSub.service, node: 'some_other_node'})
@@ -275,7 +276,7 @@
                 expect($('iq > pubsub > publish', request).attr('node')).toEqual('anode');
                 expect($('iq > pubsub > publish > item', request).attr('id')).toEqual('some_id');
                 expect($('iq > pubsub > publish > item > entry', request).text()).toEqual('Hello world');
-                response = $iq({type: 'result', id: $('iq', request).attr('id')})
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'})
                     .c('pubsub', {xmlns: Strophe.NS.PUBSUB})
                     .c('publish', {node: 'anode'})
                     .c('item', {id: 'some_id'})
@@ -301,7 +302,7 @@
                 expect($('iq > pubsub > publish > item', request).attr('id')).toEqual('some_id');
                 expect($('iq > pubsub > publish > item > entry[xmlns="' + Strophe.NS.ATOM + '"]', request).length > 0).toBeTruthy();
                 expect($('iq > pubsub > publish > item > entry > updated', request).length > 0).toBeTruthy();
-                response = $iq({type: 'result', id: $('iq', request).attr('id')})
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'})
                     .c('pubsub', {xmlns: Strophe.NS.PUBSUB})
                     .c('publish', {node: 'anode'})
                     .c('item', {id: 'some_id'})
@@ -324,7 +325,7 @@
                 expect($('iq > pubsub', request).attr('xmlns')).toEqual(Strophe.NS.PUBSUB);
                 expect($('iq > pubsub > retract', request).attr('node')).toEqual('anode');
                 expect($('iq > pubsub > retract > item', request).attr('id')).toEqual('some_id');
-                response = $iq({type: 'result', id: $('iq', request).attr('id')});
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'});
                 xmppMocker.receive(connection, response);
             });
             promise = connection.PubSub.deleteItem('anode', 'some_id');
@@ -343,7 +344,7 @@
                 expect($('iq > pubsub > retract', request).attr('node')).toEqual('anode');
                 expect($('iq > pubsub > retract', request).attr('notify')).toEqual('true');
                 expect($('iq > pubsub > retract > item', request).attr('id')).toEqual('some_id');
-                response = $iq({type: 'result', id: $('iq', request).attr('id')});
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'});
                 xmppMocker.receive(connection, response);
             });
             promise = connection.PubSub.deleteItem('anode', 'some_id', true);
@@ -361,7 +362,7 @@
                 expect($('iq', request).attr('type')).toEqual('get');
                 expect($('iq > pubsub', request).attr('xmlns')).toEqual(Strophe.NS.PUBSUB);
                 expect($('iq > pubsub > items', request).attr('node')).toEqual('anode');
-                response = $iq({type: 'result', id: $('iq', request).attr('id')})
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'})
                     .c('pubsub', {xmlns: Strophe.NS.PUBSUB})
                     .c('items', {node: 'anode'})
                     .c('item', {id: 'some_id'})
@@ -393,7 +394,7 @@
                 expect($('iq > pubsub', request).attr('xmlns')).toEqual(Strophe.NS.PUBSUB);
                 expect($('iq > pubsub > items', request).attr('node')).toEqual('anode');
                 expect($('iq > pubsub > items', request).attr('max_items')).toEqual('10');
-                response = $iq({type: 'result', id: $('iq', request).attr('id')})
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'})
                     .c('pubsub', {xmlns: Strophe.NS.PUBSUB})
                     .c('items', {node: 'anode'})
                     .c('item', {id: 'some_id'})
@@ -422,7 +423,7 @@
                 var item_ids = _.map($('iq > pubsub > items > item', request), function (item) { return $(item).attr('id'); });
                 expect(item_ids).toEqual(['some_id', 'another_id']);
 
-                response = $iq({type: 'result', id: $('iq', request).attr('id')})
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'})
                     .c('pubsub', {xmlns: Strophe.NS.PUBSUB})
                     .c('items', {node: 'anode'})
                     .c('item', {id: 'some_id'})
@@ -449,7 +450,7 @@
                 expect($('iq', request).attr('type')).toEqual('get');
                 expect($('iq > pubsub', request).attr('xmlns')).toEqual(Strophe.NS.PUBSUB);
                 expect($('iq > pubsub > items', request).attr('node')).toEqual('anode');
-                response = $iq({type: 'result', id: $('iq', request).attr('id')})
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'})
                     .c('pubsub', {xmlns: Strophe.NS.PUBSUB})
                     .c('items', {node: 'anode'})
                     .c('item', {id: 'some_id'})
@@ -486,7 +487,7 @@
                 expect($('iq > pubsub', request).attr('xmlns')).toEqual(Strophe.NS.PUBSUB);
                 expect($('iq > pubsub > subscribe', request).attr('node')).toEqual('anode');
                 expect($('iq > pubsub > subscribe', request).attr('jid')).toEqual(Strophe.getBareJidFromJid(connection.jid));
-                response = $iq({type: 'result', id: $('iq', request).attr('id')});
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'});
                 xmppMocker.receive(connection, response);
             });
             promise = connection.PubSub.subscribe('anode');
@@ -505,7 +506,7 @@
                 expect($('iq > pubsub > unsubscribe', request).attr('node')).toEqual('anode');
                 expect($('iq > pubsub > unsubscribe', request).attr('jid')).toEqual(Strophe.getBareJidFromJid(connection.jid));
                 expect($('iq > pubsub > unsubscribe', request).attr('subid')).toEqual('sub_id');
-                response = $iq({type: 'result', id: $('iq', request).attr('id')});
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'});
                 xmppMocker.receive(connection, response);
             });
             promise = connection.PubSub.unsubscribe('anode', 'sub_id');
@@ -522,7 +523,7 @@
                 expect($('iq', request).attr('type')).toEqual('get');
                 expect($('iq > pubsub', request).attr('xmlns')).toEqual(Strophe.NS.PUBSUB);
                 expect($('iq > pubsub > subscriptions', request).length).toEqual(1);
-                response = $iq({type: 'result', id: $('iq', request).attr('id')})
+                response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'pubsub.xmpp'})
                     .c('pubsub', {xmlns: Strophe.NS.PUBSUB})
                     .c('subscription', {jid: connection.jid, node: 'anode', subid: '123', subscription: 'subscribed'})
                     .tree();

@@ -63,7 +63,7 @@
                     expect($('iq', request).attr('type')).toEqual('get');
                     expect($('iq', request).attr('to')).toEqual('stpeter@riot.com');
                     expect($('iq > vCard', request).attr('xmlns')).toEqual(Strophe.NS.vCard);
-                    response = $iq({type: 'result', id: $('iq', request).attr('id')})
+                    response = $iq({type: 'result', id: $('iq', request).attr('id'), from: 'stpeter@riot.com'})
                         .c('vCard', {xmlns: Strophe.NS.vCard, version: '2.0'})
                         .c('FN', {}, 'Peter Saint-Andre')
                         .c('N')

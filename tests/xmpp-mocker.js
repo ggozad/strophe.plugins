@@ -1,4 +1,5 @@
 (function ($, Strophe) {
+    Strophe.Bosh.prototype._processRequest = function (i) {};
     window.xmppMocker = {
 
         jquerify: function (builder) {
@@ -30,9 +31,7 @@
             var c = new Strophe.Connection('');
             c.connect_callback = callback;
             c.authenticated = true;
-            c.connected = true;
             c.jid = 'mocker@xmpp/r2';
-            c._processRequest = function () {};
             c._changeConnectStatus(Strophe.Status.CONNECTED);
             c.disconnect = function () {
                 c._doDisconnect();
