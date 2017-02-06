@@ -45,10 +45,15 @@
         },
 
         // **get** resolves with a dictionary of the authenticated user's roster.
-        get: function () {
+        get: function (version) {
             var d = $.Deferred(), roster,
-                iq = $iq({type: 'get',  id: this._connection.getUniqueId('roster')})
-                    .c('query', {xmlns: Strophe.NS.ROSTER});
+                iq = $iq({type: 'get',  id: this._connection.getUniqueId('roster')}),
+                newVersion;
+            if (version) {
+                iq.c('query', {xmlns: Strophe.NS.ROSTER, ver: version});
+            } else {
+                iq.c('query', {xmlns: Strophe.NS.ROSTER});
+            }
             this._connection.sendIQ(iq.tree(), function (result) {
                 roster = {};
                 $.each($('item', result), function (idx, item) {
@@ -58,6 +63,13 @@
                         groups: $.map($('group', item), function (group, idx) { return $(group).text(); })
                     };
                 });
+                newVersion = $('query', result).attr('ver');
+                if (newVersion) {
+                    roster.version = newVersion;
+                } else if (version) {
+                    roster.version = version;
+                }
+
                 d.resolve(roster);
             }, d.reject);
             return d.promise();
